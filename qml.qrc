@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MainForm.ui.qml</file>
+        <file>scripts/globals.js</file>
+        <file>controllers/JSONListModel.qml</file>
+        <file>controllers/jsonpath.js</file>
+        <file>scripts/servReq.js</file>
+        <file>controllers/HTTP.qml</file>
+        <file>controllers/UserController.qml</file>
+        <file>Views/Main.qml</file>
+        <file>Views/PersonForm.qml</file>
+        <file>controllers/SessionController.qml</file>
+        <file>Views/SignIn.qml</file>
+        <file>images/navigation_next_item.png</file>
+        <file>images/toolbar.png</file>
+        <file>images/navigation_previous_item.png</file>
+        <file>controllers/PersonController.qml</file>
+        <file>Views/EditPersonComp.qml</file>
+        <file>controllers/RoleController.qml</file>
+        <file>Views/EditRolesComp.qml</file>
+        <file>Views/EditPersonRolesComp.qml</file>
+        <file>images/delete.png</file>
+    </qresource>
+</RCC>
