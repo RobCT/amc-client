@@ -21,5 +21,13 @@
         <file>Views/EditRolesComp.qml</file>
         <file>Views/EditPersonRolesComp.qml</file>
         <file>images/delete.png</file>
+        <file>Views/CalendarMonth.qml</file>
+        <file>Views/EditEventsComp.qml</file>
+        <file>controllers/EventController.qml</file>
+        <file>scripts/moment.js</file>
+        <file>components/DateEdit.qml</file>
+        <file>components/TimeEdit.qml</file>
+        <file>images/double-chevron-left-120.png</file>
+        <file>images/arrow__chevron-double-bold-2-01-128.png</file>
     </qresource>
 </RCC>

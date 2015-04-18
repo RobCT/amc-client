@@ -16,37 +16,33 @@ Item {
     property string source: ""
     property var json: http.jsn
     property string query: ""
-    property bool ready: false
     property int readyId
+    property string method
+    property string params
+    property alias ready: http.ready
+    property alias status: http.status
 
 
     property ListModel model : ListModel { id: jsonModel }
     property alias count: jsonModel.count
     Component.onCompleted: {
         Func.internalQmlObject.servDone.connect(internalCom);
+        method = "GET"
 
     }
     function internalCom(callid)    {
         if (callid == 99) {
-            ready = true
+            //ready = true
         }
     }
 
     onSourceChanged: {
-
-
-        try {
-            G.jsonString = ""
-           http.servReq("GET", "", source, 99)
-            console.log("source",source, json)
-            ready = false
-            G.jsonString = json
-
-        } catch(e) {
-
-            return;
-        }
+        somethingChanged()
     }
+    onParamsChanged: {
+        somethingChanged()
+    }
+
     onJsonChanged: updateJSONModel()
     onQueryChanged: updateJSONModel()
 
@@ -84,6 +80,35 @@ Item {
 
         return objectArray;
     }
+    function somethingChanged() {
+        if (method === "GET") {
+
+            try {
+                G.jsonString = ""
+               http.servReq("GET", "", source, 99)
+                console.log("source",source, json)
+                ready = false
+                G.jsonString = json
+
+            } catch(e) {
+
+                return;
+            }
+        }
+        else {
+            try {
+               http.servReq(method, params, source, 99)
+                console.log("source",source, json)
+                //ready = false
+                method = "GET"
+            } catch(e) {
+
+                return;
+            }
+
+        }
+    }
+
     HTTP {
         id: http
         onJsnChanged:  {

@@ -24,7 +24,7 @@ ApplicationWindow {
     property string topwidg: "Top"
     statusBar: StatusBar {
         RowLayout {
-            anchors.fill: parent
+
             Label { id:status; text: entry.status }
         }
     }
@@ -196,7 +196,7 @@ ApplicationWindow {
                     while (entry.depth > 1) {
                         entry.pop()
                     }
-                    entry.pushOther(7)
+                    entry.pushOther(11)
 
                }
             }
@@ -271,6 +271,11 @@ ApplicationWindow {
             else if (val === 3) push({item: editPerson, properties: {newp: true}})
             else if (val === 4) push({item: editPersonRoles, properties: {pid: lists.loaded.id}})
             else if (val === 6) push(editRoles)
+            else if (val == 8) { push({item: evComp, properties: {newp: false, selected_date: entry.lists.blank.date}})
+
+            }
+            else if (val == 9) push({item: evComp, properties: {newp: true}})
+            else if (val === 11) push(testCalendar)
             }
 
 
@@ -310,6 +315,17 @@ ApplicationWindow {
 
         }
     }
+    Component {
+        id: testCalendar
+        L.CalendarMonth {
 
+        }
+    }
+    Component {
+        id: evComp
+        L.EditEventsComp {
+
+        }
+    }
 }
 
