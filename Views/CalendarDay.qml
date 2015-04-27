@@ -13,6 +13,7 @@ Rectangle {
     width: Screen.width
     height: Screen.height
     color: "lightsteelblue"
+    property alias  selectedDate: calendar.selectedDate
     onVisibleChanged: {
         if (visible) tim2.start()
 
@@ -23,8 +24,9 @@ Rectangle {
           interval: 1; running: false; repeat: false
             onTriggered: {
                 if (!entry.busy)
-                    calEvents.getCalendar(calendar.selectedDate.year(),calendar.selectedDate.month()+1,01,"month")
+                calEvents.getCalendar(calendar.selectedDate.year(),calendar.selectedDate.month()+1,calendar.selectedDate.date(),"day")
                 else restart()
+
             }
     }
 
@@ -39,18 +41,6 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             font.pointSize: 30
-            MouseArea {
-                id: editEvents
-                anchors.fill: parent
-                anchors.margins: -10
-                onClicked: {
-                    entry.lists.blank = {"date":""}
-                    console.log(calendar.currentDate)
-                    entry.lists.blank.date = D.moment(calendar.currentDate).format("YYYY-MM-DD")
-                    entry.pushOther(9)
-                }
-            }
-
         }
 
         Rectangle {
@@ -76,7 +66,8 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.subtract(1,"months")
+                    calendar.selectedDate = calendar.selectedDate.subtract(1,"days")
+                    console.log("dateChanged", calendar.selectedDate)
                 }
 
             }
@@ -104,7 +95,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.subtract(1,"years")
+                    calendar.selectedDate = calendar.selectedDate.subtract(7,"days")
                 }
 
             }
@@ -132,8 +123,8 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.add(1,"months")
-                    //console.log(calendar.selectedDate)
+                    calendar.selectedDate = calendar.selectedDate.add(1,"days")
+                    console.log("dateChanged", calendar.selectedDate)
                 }
 
             }
@@ -161,38 +152,12 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.add(1,"years")
+                    calendar.selectedDate = calendar.selectedDate.add(7,"days")
                 }
 
             }
         }
-        Rectangle {
-            id: week
-            width: parent.height
-            anchors.right: parent.right
-            anchors.rightMargin: height*3
-            //opacity: entry.depth > 1 ? 1 : 0
-            anchors.verticalCenter: parent.verticalCenter
-            antialiasing: true
-            height: parent.height
-            radius: 4
-            color: weekmouse.pressed ? "#222" : "transparent"
-            Behavior on opacity { NumberAnimation{} }
-            Text {
-                text: "W"
-                font.pointSize: 30
-            }
 
-            MouseArea {
-                id: weekmouse
-                anchors.fill: parent
-                anchors.margins: -10
-                onClicked: {
-                    entry.push({item: weekComp, properties: {selectedDate: D.moment(calendar.currentDate)}})
-                }
-
-            }
-        }
 
     }
 
@@ -205,25 +170,83 @@ Rectangle {
         delegate: calDelegate
         width: parent.width
         height: parent.height*7/8
-        cellWidth: width/7
-        cellHeight: height/(model.count/7) +1
+        cellWidth: width
+        cellHeight: height
         property var selectedDate
         property var currentDate
         property var currentEvents
+        property var currentSheets
         onSelectedDateChanged:  {
+            console.log("dateChanged", selectedDate)
             //console.log(selectedDate,selectedDate.year(),selectedDate.month())
-            calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,01,"month")
+            calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"day")
             banner.text = selectedDate.format("MMM YYYY")
         }
+        function callEdit(id) {
+            entry.push({item: editev, properties: {index: id}})
+        }
+        function callSheet(id) {
+            entry.push({item: sheet, properties: {index: id}})
+        }
+
+        function eventPlot(events, sceneid, sceney, scenex) {
+
+            var oneHour = 24
+
+            sceney = sceney | 0
+
+            oneHour = sceney/24
+            var evx, evy, evw, evh
+            var evplot
+            var evinst
+            var evarray = []
+            //console.log(oneHour, events.count, sceneid, sceney, scenex)
+            for (var ind = 0; ind < events.count ; ind++) {
+                var evend = D.moment(events.get(ind).eventend)
+                var evstart =D.moment(events.get(ind).eventstart)
+                var evlength = D.moment(evend.diff(evstart))
+                evx = 10
+                evw = scenex
+                evy = evstart.hour() * oneHour + evstart.minute() * oneHour/60
+                evh = evlength.hour() * oneHour + evlength.minute() * oneHour/60
+                evarray[evarray.length]={"x": evx, "y": evy, "width": evw, "height": evh, "text": events.get(ind).title, "eventId": events.get(ind).id, "clickAction": callEdit, "pressAction": callSheet ,"ovlapCount": 0, "ovlapIndex": 0}
+                console.log(events, sceneid, sceney, scenex, evy, evh,events.get(ind).title,D.moment(D.moment(events.get(ind).start)).hour(), D.moment(events.get(ind).start).minute())
+            }
+            if (evarray.length > 1) {
+            for (ind = 0; ind < evarray.length; ind++) {
+                for (var iind = ind + 1; iind < evarray.length; iind++) {
+                    if ((evarray[ind].y > evarray[iind].y && evarray[ind].y < evarray[iind].y + evarray[iind].height) || ((evarray[iind].y > evarray[ind].y && evarray[iind].y < evarray[ind].y + evarray[ind].height) )) {
+                               evarray[ind].ovlapCount =  evarray[ind].ovlapCount + 1
+                               evarray[iind].ovlapCount =  evarray[iind].ovlapCount +1
+                               evarray[iind].ovlapIndex = evarray[iind].ovlapIndex + 1
+                            }
+                }
+            }
+            }
+
+            for (ind = 0; ind < evarray.length; ind++) {
+                evplot = Qt.createComponent("../components/EventPlot.qml")
+                if (evplot.status == Component.Ready)
+                    console.log("evplot ready")
+                if (evarray[ind].ovlapCount > 0) {
+                    evarray[ind].width = scenex/(evarray[ind].ovlapCount+1)
+                    evarray[ind].x = 10 + scenex * evarray[ind].ovlapIndex/(evarray[ind].ovlapCount+1)
+                }
+                        evinst = evplot.createObject(sceneid, evarray[ind]);
+
+            }
+
+        }
+
 
         Timer {
             id: tim1
               interval: 1; running: false; repeat: false
                 onTriggered: {
                     if (!entry.busy) {
-                        calendar.selectedDate = D.moment()
+                        //calendar.selectedDate = D.moment()
                         calendar.currentDate = selectedDate
-                        calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,01,"month")
+                        calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"day")
                     }
                     else restart()
             }
@@ -245,22 +268,26 @@ Rectangle {
                 height: calendar.cellHeight
                 border.width: 1
                 border.color: "grey"
-                color: GridView.isCurrentItem ? "blue" : "cyan"
+                color:  "cyan"
+                property var ev: events
                 MouseArea {
                     id:clicker
                     width: parent.width
                     height: parent.height
                     onClicked: {
-                        //console.log(events.get(0).title)
+
+
                         calendar.currentIndex = index
                         calendar.currentDate = date
                         calendar.currentEvents = events
                     }
-                    onPressAndHold:  {
-                        entry.push({item: sheet, properties: {index: editev.index}})
 
-                    }
                 }
+                onEvChanged: {
+
+                    calendar.eventPlot(events, wrapper, height - calInfo.height, width)
+                }
+
 
 
                 Text {
@@ -272,14 +299,8 @@ Rectangle {
                         width: parent.width
                         height: parent.height
                         onClicked:  {
-                        //    entry.lists.blank = {"date":""}
-                        //    entry.lists.blank.date = D.moment(date).format("YYYY-MM-DD")
-                        //    entry.pushOther(8)
-                            //dialog1.index = 0
-                            //dialog1.setDate = date
-                            //top.visible = false
-                            //dialog1.open()
-                            entry.push({item: editev, properties: {setDate: D.moment(date), index: 0}})
+
+                            entry.push({item: editev, properties: {setDate: date, index: 0}})
 
 
 
@@ -287,47 +308,11 @@ Rectangle {
                     }
                 }
 
- /*               ListView {
 
 
-                    model: events
-                    anchors.top: calInfo.bottom
-                    anchors.bottom: parent.bottom
-                    delegate: Text {
-                        text: title + " @ " + D.moment(start).format("HH:mm")
-                    }
-                } */
-                TableView {
-                    id: eventSelect
-                    width: calendar.cellWidth
 
-                    anchors.top: calInfo.bottom
-                    anchors.bottom: parent.bottom
-                    model: events
-                    headerVisible: false
-                    visible: true
-                    TableViewColumn {
-                        role: "title"
-                        title: "Title"
-                        width: calendar.cellWidth
-                    }
-/*                    TableViewColumn {
-                        role: "eventdate"
-                        title: "Date"
-                        width: calendar.cellWidth/2
-                    }*/
-                    onClicked: {
-                        //console.log("dcev",eventSelect.currentRow, events.get(eventSelect.currentRow).id )
-                        //dialog1.index = events.get(eventSelect.currentRow).id
-                        //top.visible = false
-                        //dialog1.open()
-                        entry.push({item: editev, properties: {index: events.get(eventSelect.currentRow).id}})
-
-                    }
-
-
-            }
         }
+
     }
     ListModel {
         id: caldata
@@ -344,17 +329,20 @@ Rectangle {
     }
     }
     Component {
-        id: weekComp
-        L.CalendarWeek {
-
-
-    }
-    }
-    Component {
         id:sheet
     L.EditVolunteerSheet {
 
     }
+    }
+    Component {
+        id: eventRect
+        Rectangle {
+            property alias text: evTitle.text
+
+            Text {
+                id: evTitle
+            }
+        }
     }
 
 

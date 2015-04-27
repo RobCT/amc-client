@@ -14,13 +14,14 @@ Item {
     id: intmodel
 
     property string source: ""
-    property var json: http.jsn
+    property var json//: http.jsn
     property string query: ""
     property int readyId
+    property bool trigger
     property string method
     property string params
-    property alias ready: http.ready
-    property alias status: http.status
+    property bool ready//: http.ready
+    property int status//: http.status
 
 
     property ListModel model : ListModel { id: jsonModel }
@@ -36,15 +37,24 @@ Item {
         }
     }
 
-    onSourceChanged: {
+    onTriggerChanged: {
+        somethingChanged()
+    }
+
+/*    onSourceChanged: {
         somethingChanged()
     }
     onParamsChanged: {
         somethingChanged()
-    }
+    }*/
 
     onJsonChanged: updateJSONModel()
     onQueryChanged: updateJSONModel()
+
+    function commit() {
+        if (trigger) trigger = false
+        else trigger = true
+    }
 
     function updateJSONModel() {
         jsonModel.clear();
@@ -85,8 +95,8 @@ Item {
 
             try {
                 G.jsonString = ""
-               http.servReq("GET", "", source, 99)
-                console.log("source",source, json)
+               servReq("GET", "", source, 99)
+                //console.log("source",source, json)
                 ready = false
                 G.jsonString = json
 
@@ -97,7 +107,7 @@ Item {
         }
         else {
             try {
-               http.servReq(method, params, source, 99)
+               servReq(method, params, source, 99)
                 console.log("source",source, json)
                 //ready = false
                 method = "GET"
@@ -109,10 +119,58 @@ Item {
         }
     }
 
-    HTTP {
-        id: http
-        onJsnChanged:  {
-            //mf.ta1.append(JSON.stringify(jsn))
+    function servReq(method, params, url, callid) {
+        var internalQmlObject = Qt.createQmlObject('import QtQuick 2.0; QtObject { signal servDone(int value) }', Qt.application, 'InternalQmlObject');
+        var xhr = new XMLHttpRequest();
+        ready = false
+        xhr.onreadystatechange=function(){
+          if (xhr.readyState==4 && xhr.status==200)
+         {
+/*              internalQmlObject.servDone(callid);
+              jsn = xhr.responseText
+              //console.log("one",xhr.responseText, url)
+              //return jsn
+*/
+
+          }
+          if (xhr.readyState==4) {
+              internalQmlObject.servDone(callid);
+              status = xhr.status
+              json = xhr.responseText
+              ready = false
+              console.log("one", ready)
+              if (ready) ready = false
+              else ready = true
+
+              console.log("two",xhr.status, ready, url)
+              //json = jsonString
+
+
+
+
+          }
         }
+        var async = true;
+        xhr.open(method, url, async);
+        console.log(method,url)
+      //Need to send proper header information with POST request
+      xhr.setRequestHeader('Content-type', 'application/json');
+      //xhr.setRequestHeader('Content-length', params.length);
+      //xhr.setRequestHeader('Host:', 'api.marketplace.dev');
+        xhr.setRequestHeader('Accept', 'application/vnd.marketplace.v1');
+        xhr.setRequestHeader('Host', 'api.marketplace.dev');
+        xhr.setRequestHeader('Connection', 'Keep-Alive');
+        xhr.setRequestHeader('Authorization', G.token);
+        //console.log("token", G.token)
+        if (method === "DELETE") {
+            console.log("delete params", params)
+        }
+
+        if (params.length) {
+            xhr.send(params);
+        }
+        else xhr.send();
     }
+
+
 }

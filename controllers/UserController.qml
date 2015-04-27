@@ -31,13 +31,17 @@ Item {
         }
     }
     function getAll() {
+        model1.method = "GET"
         model1.source = ""
         model1.source = G.apiRoot + "/users"
+        model1.commit()
         console.log("source ", model1.source)
     }
     function getUsers(pid) {
+        model2.method = "GET"
         model2.source = ""
         model2.source = G.apiRoot + "/users/" + pid.toString()
+        model2.commit()
     }
     function newUser(user){
         userController.ready = false

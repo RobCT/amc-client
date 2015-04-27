@@ -7,8 +7,10 @@ import QtQuick.LocalStorage 2.0
 import QtQuick.Layouts 1.1
 import Qt.labs.settings 1.0
 import "." as L
+import "../components" as Comp
 //import "../scripts/functions.js" as Func
 import "../scripts/globals.js" as G
+
 
 
 
@@ -242,6 +244,7 @@ ApplicationWindow {
         anchors.fill: parent
         property string status
         property var lists
+        property var pid
         property var signin: {"signedin": false, "auth_token": "", "currentEmail": "", "currentPassword": ""}
 
 
@@ -265,16 +268,14 @@ ApplicationWindow {
        }
         function pushOther(val) {
             console.log("signal", val )
-            if (val === 1) push(personComp)
+            if (val === 1) replace(personComp)
             else if (val === 99) push(signinComp)
             else if (val === 2) push({item: editPerson, properties: {newp: false}})
             else if (val === 3) push({item: editPerson, properties: {newp: true}})
             else if (val === 4) push({item: editPersonRoles, properties: {pid: lists.loaded.id}})
             else if (val === 6) push(editRoles)
-            else if (val == 8) { push({item: evComp, properties: {newp: false, selected_date: entry.lists.blank.date}})
+            else if (val === 7) push(ev2Comp)
 
-            }
-            else if (val == 9) push({item: evComp, properties: {newp: true}})
             else if (val === 11) push(testCalendar)
             }
 
@@ -321,9 +322,11 @@ ApplicationWindow {
 
         }
     }
+
+
     Component {
-        id: evComp
-        L.EditEventsComp {
+        id: ev2Comp
+        Comp.EditEvent {
 
         }
     }

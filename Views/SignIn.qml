@@ -92,6 +92,8 @@ Rectangle {
             onClicked: {
 
                     session.destroySession(entry.signin.auth_token)
+                    entry.signin.signedin = false
+
                     console.log(JSON.stringify(entry.signin.auth_token))
 
 
@@ -127,6 +129,7 @@ Rectangle {
                 if (status == 200) {
                     entry.signin.auth_token = tok.auth_token
                     entry.signin.currentEmail = tok.email
+                    entry.signin.signedin = true
                     G.token = tok.auth_token
                     entry.pushOther(1)
                     //console.log(entry.signin.auth_token,entry.signin.currentEmail)

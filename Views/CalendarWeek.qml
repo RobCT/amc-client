@@ -13,6 +13,7 @@ Rectangle {
     width: Screen.width
     height: Screen.height
     color: "lightsteelblue"
+    property alias  selectedDate: calendar.selectedDate
     onVisibleChanged: {
         if (visible) tim2.start()
 
@@ -23,8 +24,9 @@ Rectangle {
           interval: 1; running: false; repeat: false
             onTriggered: {
                 if (!entry.busy)
-                    calEvents.getCalendar(calendar.selectedDate.year(),calendar.selectedDate.month()+1,01,"month")
+                calEvents.getCalendar(calendar.selectedDate.year(),calendar.selectedDate.month()+1,calendar.selectedDate.date(),"week")
                 else restart()
+
             }
     }
 
@@ -39,18 +41,6 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             font.pointSize: 30
-            MouseArea {
-                id: editEvents
-                anchors.fill: parent
-                anchors.margins: -10
-                onClicked: {
-                    entry.lists.blank = {"date":""}
-                    console.log(calendar.currentDate)
-                    entry.lists.blank.date = D.moment(calendar.currentDate).format("YYYY-MM-DD")
-                    entry.pushOther(9)
-                }
-            }
-
         }
 
         Rectangle {
@@ -76,7 +66,8 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.subtract(1,"months")
+                    calendar.selectedDate = calendar.selectedDate.subtract(7,"days")
+                    console.log("dateChanged", calendar.selectedDate)
                 }
 
             }
@@ -104,7 +95,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.subtract(1,"years")
+                    calendar.selectedDate = calendar.selectedDate.subtract(1,"months")
                 }
 
             }
@@ -132,8 +123,8 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.add(1,"months")
-                    //console.log(calendar.selectedDate)
+                    calendar.selectedDate = calendar.selectedDate.add(7,"days")
+                    console.log("dateChanged", calendar.selectedDate)
                 }
 
             }
@@ -161,7 +152,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    calendar.selectedDate = calendar.selectedDate.add(1,"years")
+                    calendar.selectedDate = calendar.selectedDate.add(1,"months")
                 }
 
             }
@@ -179,7 +170,7 @@ Rectangle {
             color: weekmouse.pressed ? "#222" : "transparent"
             Behavior on opacity { NumberAnimation{} }
             Text {
-                text: "W"
+                text: "D"
                 font.pointSize: 30
             }
 
@@ -188,7 +179,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    entry.push({item: weekComp, properties: {selectedDate: D.moment(calendar.currentDate)}})
+                    entry.push({item: dayComp, properties: {selectedDate: D.moment(calendar.currentDate)}})
                 }
 
             }
@@ -211,8 +202,9 @@ Rectangle {
         property var currentDate
         property var currentEvents
         onSelectedDateChanged:  {
+            console.log("dateChanged", selectedDate)
             //console.log(selectedDate,selectedDate.year(),selectedDate.month())
-            calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,01,"month")
+            calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"week")
             banner.text = selectedDate.format("MMM YYYY")
         }
 
@@ -221,9 +213,9 @@ Rectangle {
               interval: 1; running: false; repeat: false
                 onTriggered: {
                     if (!entry.busy) {
-                        calendar.selectedDate = D.moment()
+                        //calendar.selectedDate = D.moment()
                         calendar.currentDate = selectedDate
-                        calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,01,"month")
+                        calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"week")
                     }
                     else restart()
             }
@@ -256,8 +248,7 @@ Rectangle {
                         calendar.currentDate = date
                         calendar.currentEvents = events
                     }
-                    onPressAndHold:  {
-                        entry.push({item: sheet, properties: {index: editev.index}})
+                    onDoubleClicked: {
 
                     }
                 }
@@ -265,6 +256,7 @@ Rectangle {
 
                 Text {
                     id: calInfo
+
 
                     text: D.moment(date).format("ddd Do")
                     color: wrapper.GridView.isCurrentItem ? "red" : "black"
@@ -279,7 +271,7 @@ Rectangle {
                             //dialog1.setDate = date
                             //top.visible = false
                             //dialog1.open()
-                            entry.push({item: editev, properties: {setDate: D.moment(date), index: 0}})
+                            entry.push({item: editev, properties: {setDate: date, index: 0}})
 
 
 
@@ -287,17 +279,75 @@ Rectangle {
                     }
                 }
 
- /*               ListView {
-
-
+               ListView {
+                    id: eventList
+                    width: calendar.cellWidth
+                    height: calendar.cellHeight
                     model: events
+                    property color highlighted: wrapper.color
+                    property var rowheight: events.count ? height/(events.count) : 30
                     anchors.top: calInfo.bottom
                     anchors.bottom: parent.bottom
-                    delegate: Text {
-                        text: title + " @ " + D.moment(start).format("HH:mm")
-                    }
-                } */
-                TableView {
+                    delegate: eventDelegate
+                }
+               Component {
+                   id: eventDelegate
+                   Item {
+                       id: del1
+                       width: eventList.width
+                       height: eventList.rowheight
+                       Column {
+                           width:parent.width
+                           height: eventList.rowheight
+                       Rectangle {
+                           width:parent.width
+                           height: parent.height/8
+                           color: eventList.highlighted
+                           border.width: 1
+                           border.color: "grey"
+                       }
+                       Rectangle {
+                           width:parent.width
+                           height: parent.height*3/4
+                           color: "lightyellow"
+                           border.color: "blue"
+                           border.width: 0.5
+
+                           Text {
+                           width: parent.width ;height: parent.height; horizontalAlignment: Text.AlignHCenter ;verticalAlignment: Text.AlignVCenter;
+                           wrapMode: Text.WordWrap
+                           text: title + " \n @ " + D.moment(eventstart).format("HH:mm" )
+                       }
+
+
+                       MouseArea {
+                           width:parent.width
+                           height: parent.height
+                           onClicked: {
+                               entry.push({item: editev, properties: {index: id}})
+
+                           }
+                           onPressAndHold: {
+                               entry.push({item: sheet, properties: {index: id}})
+                           }
+
+                       }
+
+                       }
+                       Rectangle {
+                           width:parent.width
+                           height: parent.height/8
+                           color: eventList.highlighted
+                           border.width: 1
+                           border.color: "grey"
+                       }
+                       }
+
+                       }
+                   }
+
+
+ /*               TableView {
                     id: eventSelect
                     width: calendar.cellWidth
 
@@ -309,13 +359,13 @@ Rectangle {
                     TableViewColumn {
                         role: "title"
                         title: "Title"
-                        width: calendar.cellWidth
+                        width: calendar.cellWidth/2
                     }
-/*                    TableViewColumn {
+                    TableViewColumn {
                         role: "eventdate"
                         title: "Date"
                         width: calendar.cellWidth/2
-                    }*/
+                    }
                     onClicked: {
                         //console.log("dcev",eventSelect.currentRow, events.get(eventSelect.currentRow).id )
                         //dialog1.index = events.get(eventSelect.currentRow).id
@@ -325,8 +375,7 @@ Rectangle {
 
                     }
 
-
-            }
+            }*/
         }
     }
     ListModel {
@@ -344,8 +393,8 @@ Rectangle {
     }
     }
     Component {
-        id: weekComp
-        L.CalendarWeek {
+        id: dayComp
+        L.CalendarDay {
 
 
     }
@@ -356,7 +405,6 @@ Rectangle {
 
     }
     }
-
 
 
 

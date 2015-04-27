@@ -11,7 +11,8 @@ Item {
     property int readyId
     property alias jsn: http.jsn
     property alias status: http.status
-
+    property alias m1ready: model1.ready
+    property alias m1status: model1.status
 
 
     id: rolesController
@@ -33,13 +34,17 @@ Item {
         }
     }
     function getAll() {
+        model1.method = "GET"
         model1.source = ""
         model1.source = G.apiRoot + "/roles"
+        model1.commit()
         console.log("source ", model1.source)
     }
     function getRole(pid) {
+        model2.method = "GET"
         model2.source = ""
         model2.source = G.apiRoot + "/roles/" + pid.toString()
+        model2.commit()
     }
 
 

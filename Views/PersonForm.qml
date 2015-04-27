@@ -20,23 +20,20 @@ Item {
     onVisibleChanged: {
         if (visible) {
             if (entry.lists.update) {
+                console.log(JSON.stringify(entry.lists.loaded))
                 cont1.updatePerson(JSON.stringify(entry.lists.loaded), entry.pid)
-
                 entry.lists.update = false
             }
             else if (entry.lists.create) {
+                console.log(JSON.stringify(entry.lists.loaded))
                 cont1.newPerson(JSON.stringify(entry.lists.loaded))
                 entry.lists.create = false
-
             }
-
         }
     }
-
     Component.onCompleted: {
 
     }
-
     RowLayout {
         anchors.top: row1.bottom
         Button {
@@ -190,7 +187,7 @@ Item {
                     onClicked: {
                         //entry.model = tableView1.model
                         //entry.row = tableView1.currentRow
-                        //entry.pid = tableView1.model.get(tableView1.currentRow).id
+                        entry.pid = tableView1.model.get(tableView1.currentRow).id
                         entry.lists.loaded = tableView1.model.get(tableView1.currentRow)
                         entry.pushOther(2)
                    }
@@ -215,7 +212,7 @@ Item {
                     onClicked: {
                         //entry.model = tableView1.model
                         //entry.row = tableView1.currentRow
-                        //entry.pid = tableView1.model.get(tableView1.currentRow).id
+                        entry.pid = tableView1.model.get(tableView1.currentRow).id
                         entry.lists.loaded = tableView1.model.get(tableView1.currentRow)
                         console.log("pid?", entry.lists.loaded.id)
                         entry.pushOther(4)
@@ -254,6 +251,7 @@ Item {
                     if (status == 202) {
                         //PUT
                         cont1.getAll()
+                        //console.log("PUTpf")
 
                     }
                     if (status == 203) {
