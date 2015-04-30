@@ -94,10 +94,11 @@ Item {
         if (method === "GET") {
 
             try {
+                ready = false
                 G.jsonString = ""
                servReq("GET", "", source, 99)
                 //console.log("source",source, json)
-                ready = false
+
                 G.jsonString = json
 
             } catch(e) {
@@ -107,6 +108,7 @@ Item {
         }
         else {
             try {
+                ready = false
                servReq(method, params, source, 99)
                 console.log("source",source, json)
                 //ready = false
@@ -137,7 +139,7 @@ Item {
               internalQmlObject.servDone(callid);
               status = xhr.status
               json = xhr.responseText
-              ready = false
+              //ready = false
               console.log("one", ready)
               if (ready) ready = false
               else ready = true

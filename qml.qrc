@@ -36,5 +36,13 @@
         <file>Views/CalendarDay.qml</file>
         <file>components/EventPlot.qml</file>
         <file>Views/EditVolunteerSheet.qml</file>
+        <file>controllers/SheetController.qml</file>
+        <file>controllers/TemplateController.qml</file>
+        <file>Views/EditTemplateComp.qml</file>
+        <file>Views/EditTemplateVolunteerSheet.qml</file>
+        <file>Views/CloneVolunteerSheet.qml</file>
+        <file>components/TextInputSimple.qml</file>
+        <file>components/DateInput.qml</file>
+        <file>components/TimeInput.qml</file>
     </qresource>
 </RCC>

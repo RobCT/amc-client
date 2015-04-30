@@ -9,17 +9,14 @@ import "." as Local
 import "../controllers" as Cont
 import "../scripts/moment.js" as D
 import "../components" as Comp
-Flickable {
-    id:ftop
-flickableDirection: Flickable.VerticalFlick
-property var index
+
 Rectangle {
     id: top
     width: parent.width
     height: parent.height
     property var rowheight
     color: "linen"
-    property var index: ftop.index
+    property var index
     Component.onCompleted:  {
         if (visible) {
 
@@ -39,16 +36,12 @@ Rectangle {
                 console.log(JSON.stringify(entry.lists.loaded))
                 cont3.updatePerson(JSON.stringify(entry.lists.loaded), entry.pid)
                 entry.lists.update = false
-                cont1.getEvent(editev.index)
+                cont1.getTemplate(editev.index)
             }
             else if (entry.lists.create) {
                 console.log(JSON.stringify(entry.lists.loaded))
                 cont3.newPerson(JSON.stringify(entry.lists.loaded))
                 entry.lists.create = false
-            }
-            if (entry.editProperties.editDone) {
-
-                cont4.updateSheet(JSON.stringify({"about": entry.editProperties.editText}),entry.editProperties.recordId)
             }
         }
     }
@@ -80,7 +73,7 @@ Rectangle {
            property string dialogout
            onReadyChanged: {
                if (ready == 2) {
-                   cont1.getEvent(top.index)
+                   cont1.getTemplate(top.index)
                }
            }
 
@@ -103,12 +96,18 @@ Rectangle {
                    console.log("rclick",volunteers.sheetid , volunteers.model.get(volunteers.currentIndex).id)
 
                }
+
+
+
                Dialog {
                    id: getInp
+
 
                    onVisibleChanged: {
                        if (visible) {
                        inp.text = volunteers.dialogin
+                           width = inp.implicitWidth*1.3
+                           height = inp.implicitHeight*1.3
                        console.log("diain", volunteers.dialogin)
                        }
                    }
@@ -125,7 +124,7 @@ Rectangle {
                            anchors.verticalCenter: getInpRect.verticalCenter
                            style: TextFieldStyle {
                                id: styleit
-                               font.pointSize: 26
+                               font.pointSize: 22
                                background: Rectangle {
                                    //color: index == volunteers.currentIndex ? "aquamarine" : "transparent"
                                    border.width: 1}
@@ -181,7 +180,7 @@ Rectangle {
                         width: volunteers.width/3 ;
                         height: parent.height
                         x: volunteers.width/9 | 0
-                        Text { id: disp;  font.pointSize: 12; width: parent.width ;height: parent.height; wrapMode: Text.WordWrap  ;verticalAlignment: Text.AlignVCenter;text: about }
+                        Text { id: disp;  width: parent.width ;height: parent.height; wrapMode: Text.WordWrap  ;verticalAlignment: Text.AlignVCenter;text: about }
 
 
                        MouseArea {
@@ -192,12 +191,13 @@ Rectangle {
                                vold.rclicked()
                            }
                            onPressAndHold: {
-                               //enabled = false
-                               volunteers.dialogin = about
-                               console.log("diain1", volunteers.dialogin)
-                               //getInp.open()
-                               entry.editProperties = {toEdit: disp.text, editDone: false, recordId: id}
-                               entry.push({item: editText, properties: entry.editProperties })
+                               enabled = false
+                               //console.log("diain1", volunteers.dialogin, about)
+                               volunteers.dialogin = volunteers.model.get(volunteers.currentIndex).about
+                               console.log("diain1", volunteers.dialogin, volunteers.model.get(volunteers.currentIndex).about)
+                               //disp.visible = false
+                               //inp.visible = true
+                               getInp.open()
 
                            }
                        }
@@ -316,7 +316,7 @@ Rectangle {
                        }
                        else {
                            var rid =  rolesnpeople.tvrCurrentRecord.id
-                           cont4.newSheet(JSON.stringify({"event_id": top.index, "about": "add your text here", "rowindex": volunteers.model.count + 1, "role_id": rid}))
+                           cont4.newSheet(JSON.stringify({"template_id": top.index, "about": "add your text here", "rowindex": volunteers.model.count + 1, "role_id": rid}))
                            //cont1.getEvent(top.index)
                        }
 
@@ -662,24 +662,24 @@ Rectangle {
                        }
                        if (status == 201) {
                            //POST
-                           cont1.getEvent(top.index)
+                           cont1.getTemplate(top.index)
 
 
                        }
                        if (status == 202) {
                            //PUT
-                           cont1.getEvent(top.index)
+                           cont1.getTemplate(top.index)
                            //console.log("PUTpf")
 
                        }
                        if (status == 203) {
                            //PUT
-                           cont1.getEvent(top.index)
+                           cont1.getTemplate(top.index)
 
                        }
                        if (status == 204) {
                            //DELETE
-                           cont1.getEvent(top.index)
+                           cont1.getTemplate(top.index)
 
                        }
                        if (status == 422) {
@@ -697,7 +697,7 @@ Rectangle {
 
 
 
-    Cont.EventController {
+    Cont.TemplateController {
         id:cont1
         onM2readyChanged: {
             if (m2status == 200) {
@@ -776,15 +776,9 @@ Rectangle {
 
         }
     }
-    Component {
-        id: editText
-        Comp.TextInputSimple {
-
-        }
-    }
 } //#01
 
-}
+
 
 
 

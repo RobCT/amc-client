@@ -9,24 +9,21 @@ import "." as Local
 import "../controllers" as Cont
 import "../scripts/moment.js" as D
 import "../components" as Comp
-Flickable {
-    id:ftop
-flickableDirection: Flickable.VerticalFlick
-property var index
+
 Rectangle {
     id: top
     width: parent.width
     height: parent.height
     property var rowheight
     color: "linen"
-    property var index: ftop.index
+    property var index
     Component.onCompleted:  {
         if (visible) {
 
         //console.log("Booooo",Screen.width,Screen.height)
         if (top.index > 0 ) {
 
-            cont2.getAll()
+            cont1.getEvent(top.index)
             cont3.getAll()
         }
 
@@ -34,22 +31,8 @@ Rectangle {
     }
     onVisibleChanged: {
         if (visible) {
-            cont2.getAll()
-            if (entry.lists.update) {
-                console.log(JSON.stringify(entry.lists.loaded))
-                cont3.updatePerson(JSON.stringify(entry.lists.loaded), entry.pid)
-                entry.lists.update = false
-                cont1.getEvent(editev.index)
-            }
-            else if (entry.lists.create) {
-                console.log(JSON.stringify(entry.lists.loaded))
-                cont3.newPerson(JSON.stringify(entry.lists.loaded))
-                entry.lists.create = false
-            }
-            if (entry.editProperties.editDone) {
+            cont3.getAll()
 
-                cont4.updateSheet(JSON.stringify({"about": entry.editProperties.editText}),entry.editProperties.recordId)
-            }
         }
     }
 
@@ -105,7 +88,7 @@ Rectangle {
                }
                Dialog {
                    id: getInp
-
+                   y: 20
                    onVisibleChanged: {
                        if (visible) {
                        inp.text = volunteers.dialogin
@@ -181,9 +164,32 @@ Rectangle {
                         width: volunteers.width/3 ;
                         height: parent.height
                         x: volunteers.width/9 | 0
-                        Text { id: disp;  font.pointSize: 12; width: parent.width ;height: parent.height; wrapMode: Text.WordWrap  ;verticalAlignment: Text.AlignVCenter;text: about }
+                        Text { id: disp;  width: parent.width ;height: parent.height; wrapMode: Text.WordWrap  ;verticalAlignment: Text.AlignVCenter;text: about }
 
+                       TextField {
+                           id: inp2
+                           visible: false
+                           //width: parent.width - parent.width/10 ;
+                           //x: (volunteers.width/9 + volunteers.width/60) | 0
+                           y: parent.y + parent.height/2 - height/2
+                           style: TextFieldStyle {
+                               id: styleit
+                               font.pointSize: 26
+                               background: Rectangle {
+                                   color: index == volunteers.currentIndex ? "aquamarine" : "transparent"
+                                   border.width: 0}
+                           }
+                           //height: parent.height  ;
+                           verticalAlignment: Text.AlignVCenter;
+                           text: about
+                           onEditingFinished: {
+                               aboutma.enabled = true
+                               disp.visible = true
+                               inp.visible = false
+                               cont4.updateSheet(JSON.stringify({"about": text}),id)
+                           }
 
+                       }
                        MouseArea {
                            id: aboutma
                            width: parent.width
@@ -192,12 +198,12 @@ Rectangle {
                                vold.rclicked()
                            }
                            onPressAndHold: {
-                               //enabled = false
+                               enabled = false
                                volunteers.dialogin = about
                                console.log("diain1", volunteers.dialogin)
-                               //getInp.open()
-                               entry.editProperties = {toEdit: disp.text, editDone: false, recordId: id}
-                               entry.push({item: editText, properties: entry.editProperties })
+                               //disp.visible = false
+                               //inp.visible = true
+                               getInp.open()
 
                            }
                        }
@@ -369,20 +375,14 @@ Rectangle {
 
                Text {
                    width: parent.width ;height: parent.height; verticalAlignment: Text.AlignVCenter;
-                   text: "ADD ROLE"
+                   text: "CLONE"
                }
 
                MouseArea {
                    anchors.fill: parent
                    onClicked: {
-                       entry.push(editRoles)
-                       //var rid = tabRoles.model.get(tabRoles.currentRow).id
-                       //console.log(tabRoles.currentRow, riid)
-                       //cont2.deletePersonRole(top.pid, rid )
 
-                       //console.log(entry.pid)
-                       //cont1.getRoles(top.pid)
-
+                    cont4.cloneSheet(JSON.stringify({"event_id": top.index , "template_id": tvtemplates.model.get(tvtemplates.currentRow).id}))
 
                    }
                }
@@ -437,41 +437,19 @@ Rectangle {
                MouseArea {
                    anchors.fill: parent
                    onClicked: {
-                       //entry.push({item: editPerson, properties: {newp: true}})
-                       //var rid = tabRoles.model.get(tabRoles.currentRow).id
-                       //console.log(tabRoles.currentRow, riid)
-                       //cont2.deletePersonRole(top.pid, rid )
 
-                       //console.log(entry.pid)
-                       //cont1.getRoles(top.pid)
 
 
                    }
                }
        }
        }
-           TabView {
-           id: rolesnpeople
-            //anchors.left: controls.right
-           x: parent.width*5/8
-           width:parent.width*3/8
-           height:parent.height
-           property var rolemodel
-           property var peoplemodel
-           property var tvrCurrentRecord
-           property var tvpCurrentRecord
-           Tab {
-               title: "Roles"
-               onVisibleChanged: {
-                   if (visible) {
-                       addrole.visible = true
-                       addperson. visible = false
-                   }
-               }
+
+
 
                TableView {
-               id: tvroles
-               model: rolesnpeople.rolemodel
+               id: tvtemplates
+
                onActivated: {
                    if (focus) {
                    act1.visible = true
@@ -479,133 +457,30 @@ Rectangle {
                    }
                }
                onCurrentRowChanged: {
-                   rolesnpeople.tvrCurrentRecord = model.get(currentRow)
+                   //rolesnpeople.tvrCurrentRecord = model.get(currentRow)
                }
 
                TableViewColumn {
-                   role: "description"
-                   title: "Role"
+                   role: "title"
+                   title: "Template"
                }
 
                }
-           }
-           Tab {
-               width: parent.width
-               title: "People"
-               onVisibleChanged: {
-                   if (visible) {
-                       addrole.visible = false
-                       addperson. visible = true
-                   }
-               }
-               TableView {
-               id: tvpeople
-               width: parent.width
-               model: rolesnpeople.peoplemodel
-               onActivated:  {
-                   console.log("focus",focus)
-                   if (focus) {
-                   act1.visible = true
-                   act2.visible = false
-                   }
-               }
-               onCurrentRowChanged: {
-                   rolesnpeople.tvpCurrentRecord = model.get(currentRow)
-               }
-               TableViewColumn {
-                   width: parent.width/2
-                   role: "firstname"
-                   title: "First Name"
-               }
-               TableViewColumn {
-                   width: parent.width/2
-                   role: "lastname"
-                   title: "Last Name"
-               }
 
-               }
-           }
-       }
+
+
    }//#02
 
 
 
 
-   Cont.RoleController {
-       id: cont2
-               onM1readyChanged: {
-                   if (cont2.model1.count > 0) {
-                       console.log(cont2.model1.count)
 
-                       var roleArray = []
-                       var ind
-                       for (ind = 0 ; ind < cont2.model1.count; ind++) {
-                           roleArray[cont2.model1.get(ind).id]=cont2.model1.get(ind).description
-
-                       }
-                       volunteers.ra = roleArray
-                       volunteers.ready += 1
-                       rolesnpeople.rolemodel = cont2.model1
-
-
-
-                   }
-
-               }
-               onReadyChanged: {
-
-                       if (status == 200) {
-                           //GET
-
-                       }
-                       if (status == 201) {
-                           //POST
-                           cont2.getAll()
-
-
-                       }
-                       if (status == 202) {
-                           //PUT
-                           cont2.getAll()
-                           //console.log("PUTpf")
-
-                       }
-                       if (status == 203) {
-                           //PUT
-                           cont2.getAll()
-
-                       }
-                       if (status == 204) {
-                           //DELETE
-                           cont2.getAll()
-
-                       }
-                       if (status == 422) {
-
-                           //error
-                           console.log(JSON.stringify(JSON.parse(jsn).errors))
-                           entry.status = JSON.stringify(JSON.parse(jsn).errors)
-
-
-                       }
-               }
-
-
-   }
-   Cont.PersonController {
+   Cont.TemplateController {
        id: cont3
                onM1readyChanged: {
                    if (cont3.model1.count > 0) {
-                       console.log(cont3.model1.count)
-                       var personArray = []
-                       var ind
-                       for (ind = 0 ; ind < cont3.model1.count; ind++) {
-                           personArray[cont3.model1.get(ind).id]=cont3.model1.get(ind).firstname + " " + cont3.model1.get(ind).lastname
 
-                       }
-                       volunteers.pa = personArray
-                       volunteers.ready += 1
-                       rolesnpeople.peoplemodel = cont3.model1
+                       tvtemplates.model = cont3.model1
 
 
                    }
@@ -625,7 +500,7 @@ Rectangle {
                        }
                        if (status == 202) {
                            //PUT
-                           cont3.getAll()
+                           //cont3.getAll()
                            //console.log("PUTpf")
 
                        }
@@ -662,7 +537,7 @@ Rectangle {
                        }
                        if (status == 201) {
                            //POST
-                           cont1.getEvent(top.index)
+                           entry.push({item: editSheet,replace: true, properties: {index: top.index}})
 
 
                        }
@@ -765,8 +640,8 @@ Rectangle {
 
     }
     Component {
-        id: editPerson
-        Local.EditPersonComp {
+        id: editSheet
+        Local.EditVolunteerSheet {
 
         }
     }
@@ -776,15 +651,9 @@ Rectangle {
 
         }
     }
-    Component {
-        id: editText
-        Comp.TextInputSimple {
-
-        }
-    }
 } //#01
 
-}
+
 
 
 

@@ -51,7 +51,7 @@ Item {
             id: button2
             text: qsTr("Press Me 2")
             onClicked: {
-                console.log()
+                console.log(Qt.platform.os)
             }
         }
 

@@ -204,7 +204,7 @@ ApplicationWindow {
             }
         }
         Rectangle {
-            id: testRect
+            id: templatesRect
             width: mainWindow.navheight
             height:mainWindow.height/11
             anchors.top: parent.top
@@ -214,7 +214,7 @@ ApplicationWindow {
             radius:6
             Text {
                 anchors.verticalCenter:  parent.verticalCenter
-                text: "Test"
+                text: "Volunteer Templates"
             }
 
             MouseArea {
@@ -242,6 +242,7 @@ ApplicationWindow {
     StackView {
         id: entry
         anchors.fill: parent
+        property var editProperties: {"toEdit": ""  , "editText": "", editTime: "null", editDate: "", editDone: false, recordId: "", editType: "" }
         property string status
         property var lists
         property var pid
@@ -275,8 +276,8 @@ ApplicationWindow {
             else if (val === 4) push({item: editPersonRoles, properties: {pid: lists.loaded.id}})
             else if (val === 6) push(editRoles)
             else if (val === 7) push(ev2Comp)
-
-            else if (val === 11) push(testCalendar)
+            else if (val === 8) push(volTemplates)
+            else if (val === 11) push(calendar)
             }
 
 
@@ -317,7 +318,7 @@ ApplicationWindow {
         }
     }
     Component {
-        id: testCalendar
+        id: calendar
         L.CalendarMonth {
 
         }
@@ -327,6 +328,12 @@ ApplicationWindow {
     Component {
         id: ev2Comp
         Comp.EditEvent {
+
+        }
+    }
+    Component {
+        id: volTemplates
+        L.EditTemplateComp {
 
         }
     }

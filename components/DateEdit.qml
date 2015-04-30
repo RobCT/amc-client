@@ -46,6 +46,7 @@ Item {
 
             }
 
+
             onIndateChanged:  {
                 tet1.text = D.moment(indate).format("dddd, MMMM Do YYYY")
                 console.log("ohho",tet1.text)

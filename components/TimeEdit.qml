@@ -14,6 +14,8 @@ Item {
     property alias ratio: tet1.ratio
     property alias color: tet1.textColor
     property alias bcolor: tet1.col
+    property alias timeActiveFocus: tet1.activeFocus
+    property bool accepted
 
 
     Row {
@@ -46,9 +48,25 @@ Item {
             }
 
             onTimeChanged:  {
-                console.log("timechange",  D.moment(time).format("HH:mm"))
+                //console.log("timechange",  D.moment(time).format("HH:mm"))
                 tet1.text = D.moment(time).format("HH:mm")
             }
+            onAccepted: {
+                var txt = text
+                var col = txt.search(":")
+                var hr = txt.slice(0,col)
+                var mn = txt.slice(col+1,txt.length)
+
+                var dt = D.moment(new Date(2001,01,01))
+                dt.hours(Number(hr))
+                dt.minutes(Number(mn))
+                time = dt.toISOString()
+                if (te.accepted) te.accepted = false
+                else te.accepted = true
+            }
+
+
+
 
         }
         Rectangle {

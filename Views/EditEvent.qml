@@ -22,7 +22,7 @@ Rectangle {
     Component.onCompleted:  {
         if (visible) {
 
-        console.log("Booooo",Screen.width,Screen.height)
+        //console.log("Booooo",Screen.width,Screen.height)
         if (editev.index > 0 ) {
             cont1.getEvent(editev.index)
         }
@@ -49,9 +49,21 @@ Rectangle {
     onVisibleChanged: {
         if (visible) {
 
-        console.log("Booooo",Screen.width,Screen.height)
+       // console.log("Booooo",Screen.width,Screen.height)
         if (editev.index > 0 ) {
-            cont1.getEvent(editev.index)
+            console.log(entry.editProperties.editDone,entry.editProperties.editTime,entry.editProperties.editType)
+            if (entry.editProperties.editDone && entry.editProperties.editType == "Date") {
+                entry.editProperties.editObject.date = entry.editProperties.editDate
+            }
+            else if (entry.editProperties.editDone && entry.editProperties.editType == "Time") {
+                entry.editProperties.editObject.time = entry.editProperties.editTime
+                console.log("here")
+            }
+            else if (entry.editProperties.editDone && entry.editProperties.editType == "Text") {
+                entry.editProperties.editObject.text = entry.editProperties.editText
+            }
+            else  cont1.getEvent(editev.index)
+
         }
         else {
             df1.date = editev.setDate
@@ -68,12 +80,15 @@ Rectangle {
         te1.time = cont1.model2.get(0).eventstart
         te2.time = cont1.model2.get(0).eventend
          if (cont1.model2.get(0).volunteersheets.count) {
-             sheets.visible = true
+
              actionheight = 4
+             clone.visible = false
+             sheets.visible = true
          }
          else {
              sheets.visible = false
-             actionheight = 3
+             actionheight = 4
+             clone.visible = true
          }
 
         }
@@ -322,7 +337,7 @@ Rectangle {
                 Text {
                     anchors.verticalCenter:  parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Volunteer Sheet"
+                    text: "Volunteer\n Sheet"
                 }
                 MouseArea {
                     width: parent.width
@@ -330,6 +345,29 @@ Rectangle {
                     onClicked:  {
 
                        entry.push({item: sheet, properties: {index: editev.index}})
+
+
+                    }
+                }
+            }
+            Rectangle {
+                id: clone
+                radius: 6
+                width: parent.width
+                height: parent.height/top.actionheight
+                color: "aqua"
+                visible: false
+                Text {
+                    anchors.verticalCenter:  parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Clone \nVolunteer\n Sheets"
+                }
+                MouseArea {
+                    width: parent.width
+                    height: parent.height
+                    onClicked:  {
+
+                        entry.push({item: cloneSheet, properties: {index: editev.index}})
 
 
                     }
@@ -388,9 +426,22 @@ Rectangle {
                 onTimeChanged: {
 
                 }
+                onTimeActiveFocusChanged:  {
+
+                        if (editev.visible) {
+                        entry.editProperties = {toEdit: time, editDone: false, recordId: editev.index, editObject: te1, editType: "Time"}
+                        entry.push({item: timeInput, properties: {toEdit: time, recordId: editev.index}})
+                        }
+
+                }
+
                 onFocusChanged: {
                     if (!focus) {
                         Qt.inputMethod.hide()
+                    }
+                    else {
+                        entry.editProperties = {toEdit: time, editDone: false, recordId: editev.index, editObject: df1}
+                        entry.push({item: editText, properties: {toEdit: time, recordId: editev.index}})
                     }
                 }
 
@@ -402,6 +453,7 @@ Rectangle {
                 height: parent.height/5
                 ratio: 0.8
                 bcolor: "white"
+
                 onTimeChanged: {
 
                 }
@@ -481,6 +533,24 @@ Rectangle {
                 }
         }
 
+    }
+    Component {
+        id: cloneSheet
+        Local.CloneVolunteerSheet {
+
+        }
+    }
+    Component {
+        id: dateInput
+        Comp.DateInput {
+
+        }
+    }
+    Component {
+        id: timeInput
+        Comp.TimeInput {
+
+        }
     }
 }
 }
