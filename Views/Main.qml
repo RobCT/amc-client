@@ -8,7 +8,7 @@ import QtQuick.Layouts 1.1
 import Qt.labs.settings 1.0
 import "." as L
 import "../components" as Comp
-//import "../scripts/functions.js" as Func
+import "../scripts/moment.js" as D
 import "../scripts/globals.js" as G
 
 
@@ -99,7 +99,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                   entry.push(otherForm)
+                   //entry.push(otherForm)
                 }
             }
         }
@@ -277,7 +277,7 @@ ApplicationWindow {
             else if (val === 6) push(editRoles)
             else if (val === 7) push(ev2Comp)
             else if (val === 8) push(volTemplates)
-            else if (val === 11) push(calendar)
+            else if (val === 11) push({item: calendar, properties: {selectedDate: D.moment(new Date)}})
             }
 
 

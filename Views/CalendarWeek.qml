@@ -13,7 +13,7 @@ Rectangle {
     width: Screen.width
     height: Screen.height
     color: "lightsteelblue"
-    property alias  selectedDate: calendar.selectedDate
+    property var  selectedDate
     onVisibleChanged: {
         if (visible) tim2.start()
 
@@ -35,15 +35,26 @@ Rectangle {
         width: parent.width
         height: parent.height/8
         color: "linen"
-        Text {
-            id: banner
-            color: "blue"
-            anchors.horizontalCenter: parent.horizontalCenter
+        Comp.DateTumblerInput {
+            id: bannerweek
+            anchors.left: parent.left
+            anchors.leftMargin: height
             anchors.verticalCenter: parent.verticalCenter
-            font.pointSize: 30
+            width: parent.width/3
+            height: parent.height
+            showType: "weeks"
+            //date: D.moment(new Date)
+            onReturnDateChanged: {
+                //console.log("isitme",returnDate)
+                calendar.selectedDate = returnDate
+            }
+            Component.onCompleted: {
+                bannerweek.date = D.moment(calendar.selectedDate)
+                console.log("seldate",calendar.selectedDate)
+            }
         }
 
-        Rectangle {
+/*        Rectangle {
             id: decMonth
             width: parent.height
             anchors.left: parent.left
@@ -156,7 +167,120 @@ Rectangle {
                 }
 
             }
+        }        Rectangle {
+            id: decMonth
+            width: parent.height
+            anchors.left: parent.left
+            anchors.leftMargin: height*2
+            //opacity: entry.depth > 1 ? 1 : 0
+            anchors.verticalCenter: parent.verticalCenter
+            antialiasing: true
+            height: parent.height
+            radius: 4
+            color: decmouse.pressed ? "#222" : "transparent"
+            Behavior on opacity { NumberAnimation{} }
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "../images/navigation_previous_item.png"
+                width: parent.height
+                height: parent.height
+            }
+            MouseArea {
+                id: decmouse
+                anchors.fill: parent
+                anchors.margins: -10
+                onClicked: {
+                    calendar.selectedDate = calendar.selectedDate.subtract(7,"days")
+                    console.log("dateChanged", calendar.selectedDate)
+                }
+
+            }
         }
+        Rectangle {
+            id: ddecMonth
+            width: parent.height
+            anchors.left: parent.left
+            anchors.leftMargin: height
+            //opacity: entry.depth > 1 ? 1 : 0
+            anchors.verticalCenter: parent.verticalCenter
+            antialiasing: true
+            height: parent.height
+            radius: 4
+            color: ddecmouse.pressed ? "#222" : "transparent"
+            Behavior on opacity { NumberAnimation{} }
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "../images/double-chevron-left-120.png"
+                width: parent.height
+                height: parent.height
+            }
+            MouseArea {
+                id: ddecmouse
+                anchors.fill: parent
+                anchors.margins: -10
+                onClicked: {
+                    calendar.selectedDate = calendar.selectedDate.subtract(1,"months")
+                }
+
+            }
+        }
+        Rectangle {
+            id: incMonth
+            width: parent.height
+            anchors.right: parent.right
+            anchors.rightMargin: height*2
+            //opacity: entry.depth > 1 ? 1 : 0
+            anchors.verticalCenter: parent.verticalCenter
+            antialiasing: true
+            height: parent.height
+            radius: 4
+            color: incmouse.pressed ? "#222" : "transparent"
+            Behavior on opacity { NumberAnimation{} }
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "../images/navigation_next_item.png"
+                width: parent.height
+                height: parent.height
+            }
+            MouseArea {
+                id: incmouse
+                anchors.fill: parent
+                anchors.margins: -10
+                onClicked: {
+                    calendar.selectedDate = calendar.selectedDate.add(7,"days")
+                    console.log("dateChanged", calendar.selectedDate)
+                }
+
+            }
+        }
+        Rectangle {
+            id: dincMonth
+            width: parent.height
+            anchors.right: parent.right
+            anchors.rightMargin: height
+            //opacity: entry.depth > 1 ? 1 : 0
+            anchors.verticalCenter: parent.verticalCenter
+            antialiasing: true
+            height: parent.height
+            radius: 4
+            color: dincmouse.pressed ? "#222" : "transparent"
+            Behavior on opacity { NumberAnimation{} }
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "../images/arrow__chevron-double-bold-2-01-128.png"
+                width: parent.height
+                height: parent.height
+            }
+            MouseArea {
+                id: dincmouse
+                anchors.fill: parent
+                anchors.margins: -10
+                onClicked: {
+                    calendar.selectedDate = calendar.selectedDate.add(1,"months")
+                }
+
+            }
+        }*/
         Rectangle {
             id: week
             width: parent.height
@@ -205,7 +329,7 @@ Rectangle {
             console.log("dateChanged", selectedDate)
             //console.log(selectedDate,selectedDate.year(),selectedDate.month())
             calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"week")
-            banner.text = selectedDate.format("MMM YYYY")
+            bannerweek.date = selectedDate//.format("MMM YYYY")
         }
 
         Timer {
@@ -213,7 +337,7 @@ Rectangle {
               interval: 1; running: false; repeat: false
                 onTriggered: {
                     if (!entry.busy) {
-                        //calendar.selectedDate = D.moment()
+                        calendar.selectedDate = top.selectedDate
                         calendar.currentDate = selectedDate
                         calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"week")
                     }

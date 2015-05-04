@@ -96,7 +96,7 @@ Rectangle {
     }
    function stringUp() {
 
-       var jsn = {"event":{"title": textField1.text, "eventdate": df1.date, "eventstart": te1.time, "eventend": te2.time }}
+       var jsn = {"event":{"title": textField1.text, "eventdate": df1.date, "eventstart": te1.returnTime, "eventend": te2.returnTime }}
        return JSON.stringify((jsn))
 
    }
@@ -126,8 +126,9 @@ Rectangle {
 
             Text {
                 id: text1
-
+                height: parent.height
                 text: qsTr("Title")
+                font.pixelSize: height * 0.3
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width/6
@@ -146,6 +147,7 @@ Rectangle {
                 id: text2
 
                 text: qsTr("Date")
+                font.pixelSize: height * 0.3
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width/6
@@ -164,6 +166,8 @@ Rectangle {
                 id: text3
 
                 text: qsTr("Start time")
+                font.pixelSize: height * 0.3
+
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width/6
@@ -182,6 +186,7 @@ Rectangle {
                 id: text4
 
                 text: qsTr("End")
+                font.pixelSize: height * 0.3
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width/6
@@ -201,6 +206,7 @@ Rectangle {
                 id: text5
 
                 text: qsTr("Type")
+                font.pixelSize: height * 0.3
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width/6
@@ -383,8 +389,39 @@ Rectangle {
             height:parent.height
             width: parent.width*7/16
 
+            Flickable {
+                 id: flick
 
-            TextField {
+                 width: parent.width; height: parent.height/5;
+                 contentWidth: textField1.paintedWidth
+                 contentHeight: textField1.paintedHeight
+                 clip: true
+
+                 function ensureVisible(r)
+                 {
+                     if (contentX >= r.x)
+                         contentX = r.x;
+                     else if (contentX+width <= r.x+r.width)
+                         contentX = r.x+r.width-width;
+                     if (contentY >= r.y)
+                         contentY = r.y;
+                     else if (contentY+height <= r.y+r.height)
+                         contentY = r.y+r.height-height;
+                 }
+
+                 TextEdit {
+                     id: textField1
+                     width: flick.width
+                     height: flick.height
+                     font.pixelSize:  height * 0.3
+
+                     focus: true
+                     wrapMode: TextEdit.Wrap
+                     onCursorRectangleChanged: flick.ensureVisible(cursorRectangle)
+                 }
+             }
+
+/*            TextField {
                 id: textField1
 
                 width: parent.width
@@ -395,7 +432,7 @@ Rectangle {
 
 
                 }
-            }
+            }*/
 
             Comp.DateEdit {
                 id: df1
@@ -415,8 +452,14 @@ Rectangle {
 
             }
 
+            Comp.TimeTumblerInput {
+                id:te1
+                width:parent.width
+                height: parent.height/5
+            }
 
-            Comp.TimeEdit {
+
+  /*          Comp.TimeEdit {
                 id: te1
                 width: parent.width
                 //time:
@@ -445,8 +488,14 @@ Rectangle {
                     }
                 }
 
+            } */
+
+            Comp.TimeTumblerInput {
+                id:te2
+                width:parent.width
+                height: parent.height/5
             }
-            Comp.TimeEdit {
+ /*           Comp.TimeEdit {
                 id:te2
                 width: parent.width
                 //time:
@@ -463,7 +512,7 @@ Rectangle {
                     }
                 }
 
-            }
+            }*/
 
         }
         }

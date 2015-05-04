@@ -110,7 +110,7 @@ Item {
             try {
                 ready = false
                servReq(method, params, source, 99)
-                console.log("source",source, json)
+               // console.log("source",source, json)
                 //ready = false
                 method = "GET"
             } catch(e) {
@@ -140,11 +140,11 @@ Item {
               status = xhr.status
               json = xhr.responseText
               //ready = false
-              console.log("one", ready)
+              //console.log("one", ready)
               if (ready) ready = false
               else ready = true
 
-              console.log("two",xhr.status, ready, url)
+              //console.log("two",xhr.status, ready, url)
               //json = jsonString
 
 
@@ -154,7 +154,7 @@ Item {
         }
         var async = true;
         xhr.open(method, url, async);
-        console.log(method,url)
+       // console.log(method,url)
       //Need to send proper header information with POST request
       xhr.setRequestHeader('Content-type', 'application/json');
       //xhr.setRequestHeader('Content-length', params.length);
@@ -165,7 +165,7 @@ Item {
         xhr.setRequestHeader('Authorization', G.token);
         //console.log("token", G.token)
         if (method === "DELETE") {
-            console.log("delete params", params)
+            //console.log("delete params", params)
         }
 
         if (params.length) {

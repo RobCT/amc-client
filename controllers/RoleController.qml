@@ -18,6 +18,7 @@ Item {
     id: rolesController
     Component.onCompleted: {
         F.internalQmlObject.servDone.connect(internalRefresh);
+        //G.apiRoot=Qt.platform.os == "android" ? "192.168.0.103:8080" : "127.0.0.1:8080"
     }
     L.JSONListModel {
         id:model1

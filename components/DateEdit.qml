@@ -17,6 +17,8 @@ Item {
     property alias bcolor: tet1.col
     property alias date: tet1.indate
     property alias goodDate: tet1.validDate
+    property alias dateActiveFocus: tet1.activeFocus
+
 
 
 
@@ -30,6 +32,7 @@ Item {
             height: parent.height
             width: parent.width*ratio
             style: textStyle
+            readOnly: true
             //inputMask: "99:99"
 
             property var col: "lightgreen"
@@ -48,7 +51,7 @@ Item {
 
 
             onIndateChanged:  {
-                tet1.text = D.moment(indate).format("dddd, MMMM Do YYYY")
+                tet1.text = D.moment(indate).format("ddd, MMM Do YYYY")
                 console.log("ohho",tet1.text)
                 calendar.selectedDate = D.moment(indate).toDate()
             }
@@ -87,10 +90,13 @@ Item {
         TextFieldStyle {
             id: ts
             textColor: "darkblue"
+            font.pixelSize: parent.height * 0.3
+
             background:  Rectangle {
                     id:brect
                     width: parent.width*tet1.ratio
                     height: parent.height
+
 
 
                     radius: 3
@@ -110,7 +116,8 @@ Item {
         onButtonClicked: console.log("clicked button " + clickedButton)
         onAccepted: {
             if (clickedButton == StandardButton.Ok) {
-                tet1.indate = calendar.selectedDate
+                tet1.indate = D.moment(calendar.selectedDate)
+                tet1.indate.hours(12)
                 tet1.validDate = true
             }
             else

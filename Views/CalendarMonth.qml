@@ -13,10 +13,15 @@ Rectangle {
     width: Screen.width
     height: Screen.height
     color: "lightsteelblue"
+    property var selectedDate
     onVisibleChanged: {
         if (visible) tim2.start()
 
     }
+    onWidthChanged: {
+        console.log("monthwidth")
+    }
+
 
     Timer {
         id: tim2
@@ -33,7 +38,24 @@ Rectangle {
         width: parent.width
         height: parent.height/8
         color: "linen"
-        Text {
+        Comp.DateTumblerInput {
+            id: banner
+            anchors.left: parent.left
+            anchors.leftMargin: height
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width/5
+            height: parent.height
+            showType: "months"
+            //date: D.moment(new Date)
+            onReturnDateChanged: {
+                calendar.selectedDate = returnDate
+            }
+            Component.onCompleted: {
+                banner.date = D.moment(new Date)
+            }
+        }
+
+/*        Text {
             id: banner
             color: "blue"
             anchors.horizontalCenter: parent.horizontalCenter
@@ -165,12 +187,12 @@ Rectangle {
                 }
 
             }
-        }
+        }*/
         Rectangle {
             id: week
             width: parent.height
-            anchors.right: parent.right
-            anchors.rightMargin: height*3
+            anchors.right: parent.horizontalCenter
+            anchors.rightMargin: height
             //opacity: entry.depth > 1 ? 1 : 0
             anchors.verticalCenter: parent.verticalCenter
             antialiasing: true
@@ -179,7 +201,7 @@ Rectangle {
             color: weekmouse.pressed ? "#222" : "transparent"
             Behavior on opacity { NumberAnimation{} }
             Text {
-                text: "W"
+                text: "Week View"
                 font.pointSize: 30
             }
 
@@ -188,7 +210,34 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -10
                 onClicked: {
-                    entry.push({item: weekComp, properties: {selectedDate: D.moment(calendar.currentDate)}})
+                    entry.push({item: weekComp, replace: false, properties: {selectedDate: D.moment(calendar.currentDate)}})
+                }
+
+            }
+        }
+        Rectangle {
+            id: day
+            width: parent.height
+            anchors.left: parent.horizontalCenter
+            anchors.leftMargin: height
+            //opacity: entry.depth > 1 ? 1 : 0
+            anchors.verticalCenter: parent.verticalCenter
+            antialiasing: true
+            height: parent.height
+            radius: 4
+            color: daymouse.pressed ? "#222" : "transparent"
+            Behavior on opacity { NumberAnimation{} }
+            Text {
+                text: "Day View"
+                font.pointSize: 30
+            }
+
+            MouseArea {
+                id: daymouse
+                anchors.fill: parent
+                anchors.margins: -10
+                onClicked: {
+                    entry.push({item: dayComp, replace: false, properties: {selectedDate: D.moment(calendar.currentDate)}})
                 }
 
             }
@@ -213,7 +262,7 @@ Rectangle {
         onSelectedDateChanged:  {
             //console.log(selectedDate,selectedDate.year(),selectedDate.month())
             calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,01,"month")
-            banner.text = selectedDate.format("MMM YYYY")
+            banner.date = selectedDate//.format("MMM YYYY")
         }
 
         Timer {
@@ -221,9 +270,9 @@ Rectangle {
               interval: 1; running: false; repeat: false
                 onTriggered: {
                     if (!entry.busy) {
-                        calendar.selectedDate = D.moment()
-                        calendar.currentDate = selectedDate
-                        calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,01,"month")
+                        calendar.selectedDate = top.selectedDate
+                        calendar.currentDate = calendar.selectedDate
+                        calEvents.getCalendar(calendar.selectedDate.year(),calendar.selectedDate.month()+1,01,"month")
                     }
                     else restart()
             }
@@ -287,17 +336,74 @@ Rectangle {
                     }
                 }
 
- /*               ListView {
+                ListView {
+                     id: eventList
+                     width: calendar.cellWidth
+                     height: calendar.cellHeight
+                     model: events
+                     property color highlighted: wrapper.color
+                     property var rowheight: height/4//events.count ? height/(events.count) : 30
+                     anchors.top: calInfo.bottom
+                     anchors.bottom: parent.bottom
+                     delegate: eventDelegate
+                 }
+                Component {
+                    id: eventDelegate
+                    Item {
+                        id: del1
+                        width: eventList.width
+                        height: eventList.rowheight
+                        Column {
+                            width:parent.width
+                            height: eventList.rowheight
+/*                        Rectangle {
+                            width:parent.width
+                            height: parent.height/8
+                            color: eventList.highlighted
+                            border.width: 1
+                            border.color: "grey"
+                        }*/
+                        Rectangle {
+                            width:parent.width
+                            height: delText.implicitHeight
+                            color: "lightyellow"
+                            border.color: "blue"
+                            border.width: 0.5
+
+                            Text {
+                                id: delText
+                            width: parent.width ;height: parent.height; horizontalAlignment: Text.AlignHCenter ;verticalAlignment: Text.AlignVCenter;
+                            wrapMode: Text.WordWrap
+                            text: title
+                        }
 
 
-                    model: events
-                    anchors.top: calInfo.bottom
-                    anchors.bottom: parent.bottom
-                    delegate: Text {
-                        text: title + " @ " + D.moment(start).format("HH:mm")
+                        MouseArea {
+                            width:parent.width
+                            height: parent.height
+                            onClicked: {
+                                entry.push({item: editev, properties: {index: id}})
+
+                            }
+                            onPressAndHold: {
+                                entry.push({item: sheet, properties: {index: id}})
+                            }
+
+                        }
+
+                        }
+/*                        Rectangle {
+                            width:parent.width
+                            height: parent.height/8
+                            color: eventList.highlighted
+                            border.width: 1
+                            border.color: "grey"
+                        }*/
+                        }
+
+                        }
                     }
-                } */
-                TableView {
+/*                TableView {
                     id: eventSelect
                     width: calendar.cellWidth
 
@@ -311,11 +417,11 @@ Rectangle {
                         title: "Title"
                         width: calendar.cellWidth
                     }
-/*                    TableViewColumn {
+                   TableViewColumn {
                         role: "eventdate"
                         title: "Date"
                         width: calendar.cellWidth/2
-                    }*/
+                    }
                     onClicked: {
                         //console.log("dcev",eventSelect.currentRow, events.get(eventSelect.currentRow).id )
                         //dialog1.index = events.get(eventSelect.currentRow).id
@@ -326,7 +432,7 @@ Rectangle {
                     }
 
 
-            }
+            }*/
         }
     }
     ListModel {
@@ -349,6 +455,16 @@ Rectangle {
 
 
     }
+
+    }
+
+    Component {
+        id: dayComp
+        L.CalendarDay {
+
+
+    }
+
     }
     Component {
         id:sheet

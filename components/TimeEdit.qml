@@ -30,7 +30,7 @@ Item {
             style: textStyle
             inputMask: "99:99"
 
-            property var col: "lightgreen"
+            property color col: "lightgreen"
             property real ratio: 1
             property var time
             onEditingFinished: {

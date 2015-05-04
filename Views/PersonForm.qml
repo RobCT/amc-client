@@ -8,7 +8,8 @@ import "." as Local
 import "../controllers" as Cont
 //import "../scripts/functions.js" as Func
 import "../scripts/globals.js" as G
-//import "../scripts/moment.js" as D
+import "../scripts/moment.js" as D
+import "../components" as Comp
 
 
 
@@ -59,7 +60,10 @@ Item {
             id: button3
             text: qsTr("Press Me 3")
             onClicked: {
-                stack.pushOther(10)
+                var dt = D.moment(new Date(2015,05,01))
+
+
+                entry.push({item: tumblr, properties: {date: dt, showType: "weeks"}})
             }
         }
     }
@@ -277,4 +281,10 @@ Item {
         Cont.SessionController {
             id:cont2
     }
+        Component {
+            id: tumblr
+            Comp.DateTumblerInput {
+
+            }
+        }
 }

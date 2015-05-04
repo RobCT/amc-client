@@ -16,6 +16,7 @@ Item {
     function servReq(method, params, url, callid) {
         var internalQmlObject = Qt.createQmlObject('import QtQuick 2.0; QtObject { signal servDone(int value) }', Qt.application, 'InternalQmlObject');
         var xhr = new XMLHttpRequest();
+        //console.log(url)
         ready = false
         xhr.onreadystatechange=function(){
           if (xhr.readyState==4 && xhr.status==200)

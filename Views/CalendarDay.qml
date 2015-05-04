@@ -13,7 +13,7 @@ Rectangle {
     width: Screen.width
     height: Screen.height
     color: "lightsteelblue"
-    property alias  selectedDate: calendar.selectedDate
+    property var  selectedDate
     onVisibleChanged: {
         if (visible) tim2.start()
 
@@ -35,7 +35,25 @@ Rectangle {
         width: parent.width
         height: parent.height/8
         color: "linen"
-        Text {
+        Comp.DateTumblerInput {
+            id: banner
+            anchors.left: parent.left
+            anchors.leftMargin: height
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width/3
+            height: parent.height
+            showType: "days"
+            //date: D.moment(new Date)
+            onReturnDateChanged: {
+                //console.log("isitme",returnDate)
+                calendar.selectedDate = returnDate
+            }
+            Component.onCompleted: {
+                banner.date = D.moment(calendar.selectedDate)
+                console.log("seldate",calendar.selectedDate)
+            }
+        }
+/*        Text {
             id: banner
             color: "blue"
             anchors.horizontalCenter: parent.horizontalCenter
@@ -156,7 +174,7 @@ Rectangle {
                 }
 
             }
-        }
+        }*/
 
 
     }
@@ -180,7 +198,7 @@ Rectangle {
             console.log("dateChanged", selectedDate)
             //console.log(selectedDate,selectedDate.year(),selectedDate.month())
             calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"day")
-            banner.text = selectedDate.format("MMM YYYY")
+            banner.date = selectedDate//.format("MMM YYYY")
         }
         function callEdit(id) {
             entry.push({item: editev, properties: {index: id}})
@@ -244,7 +262,7 @@ Rectangle {
               interval: 1; running: false; repeat: false
                 onTriggered: {
                     if (!entry.busy) {
-                        //calendar.selectedDate = D.moment()
+                        calendar.selectedDate = top.selectedDate
                         calendar.currentDate = selectedDate
                         calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"day")
                     }

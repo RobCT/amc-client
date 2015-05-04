@@ -44,5 +44,7 @@
         <file>components/TextInputSimple.qml</file>
         <file>components/DateInput.qml</file>
         <file>components/TimeInput.qml</file>
+        <file>components/TimeTumblerInput.qml</file>
+        <file>components/DateTumblerInput.qml</file>
     </qresource>
 </RCC>
