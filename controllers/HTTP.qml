@@ -9,16 +9,57 @@ Item {
     property var jsn
     property var status
     property bool ready
+
+    property string method
+    property string source
+    onReadyChanged: {
+        //console.log("readyChangeinsidehttp", ready)
+    }
+    function commit() {
+        if (method === "GET") {
+
+            try {
+                ready = false
+                G.jsonString = ""
+               servReq("GET", "", source, 99)
+                ////console.log("source",source, json)
+
+                G.jsonString = json
+
+            } catch(e) {
+
+                return;
+            }
+        }
+        else {
+            try {
+                ready = false
+               servReq(method, params, source, 99)
+               // //console.log("source",source, json)
+                //ready = false
+                method = "GET"
+            } catch(e) {
+
+                return;
+            }
+
+        }
+    }
+
     function servReq(method, params, url, callid) {
         var internalQmlObject = Qt.createQmlObject('import QtQuick 2.0; QtObject { signal servDone(int value) }', Qt.application, 'InternalQmlObject');
         var xhr = new XMLHttpRequest();
+        ////console.log(url)
+
         ready = false
         xhr.onreadystatechange=function(){
           if (xhr.readyState==4 && xhr.status==200)
          {
 /*              internalQmlObject.servDone(callid);
               jsn = xhr.responseText
-              //console.log("one",xhr.responseText, url)
+
+              ////console.log("one",xhr.responseText, url)
+
               //return jsn
 */
 
@@ -27,8 +68,14 @@ Item {
               internalQmlObject.servDone(callid);
               status = xhr.status
               jsn = xhr.responseText
-              ready = true
-              //console.log("two",xhr.status,jsn, url)
+
+              //ready = false
+              ////console.log("one", ready)
+              if (ready) ready = false
+              else ready = true
+
+              ////console.log("two",xhr.status, ready, url)
+
               //json = jsonString
 
 
@@ -38,7 +85,9 @@ Item {
         }
         var async = true;
         xhr.open(method, url, async);
-        console.log(method,url)
+
+        ////console.log(method,url)
+
       //Need to send proper header information with POST request
       xhr.setRequestHeader('Content-type', 'application/json');
       //xhr.setRequestHeader('Content-length', params.length);
@@ -47,9 +96,11 @@ Item {
         xhr.setRequestHeader('Host', 'api.marketplace.dev');
         xhr.setRequestHeader('Connection', 'Keep-Alive');
         xhr.setRequestHeader('Authorization', G.token);
-        //console.log("token", G.token)
+
+        ////console.log("token", G.token)
         if (method === "DELETE") {
-            console.log("delete params", params)
+            ////console.log("delete params", params)
+
         }
 
         if (params.length) {

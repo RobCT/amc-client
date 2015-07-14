@@ -21,10 +21,30 @@ Rectangle {
         }
     }
 
+    ToolBar {
+        id: tb1
+        width: top.width
+        height: (top.height/11) | 0
+        anchors.top: parent.top
+
+        property int deltah: parent.height - height
+        Local.ToolBarContent {
+            id: tbint
+            width:parent.width
+            height:parent.height
+            navheight: top.height/8
+
+        }
+    }
+
     RowLayout {
         id: rowLayout1
-        anchors.fill: parent
-        anchors.margins:  parent.width/5
+        width: parent.width
+        height:tb1.deltah
+        anchors.leftMargin:   top.width/5
+        anchors.rightMargin:   top.width/5
+        anchors.bottomMargin:   top.width/5
+        anchors.top: tb1.bottom
 
 
 

@@ -16,9 +16,18 @@ Rectangle {
         x: parent.width/6
 
         columns: 2
-        rows: 5
+
+        rows: 6
         columnSpacing: parent.width/10
         rowSpacing: parent.height/20
+        Text {text: "Your user name"}
+        TextField {
+            id: username
+            width: parent.width/2
+            placeholderText: qsTr("your username")
+
+        }
+
         Text {text: "Your email"}
         TextField {
             id: email
@@ -67,7 +76,9 @@ Rectangle {
                     passwordConfirm.visible=false
                     signin.text = "Sign In"
                     entry.signin.currentPassword = password.text
-                    users.newUser(JSON.stringify({"user":{"email": email.text, "password": password.text, "password_confirmation": passwordConfirm.text}}))
+
+                    users.newUser(JSON.stringify({"user":{"username": username.text,   "email": email.text, "password": password.text, "password_confirmation": passwordConfirm.text}}))
+
                     email.text = ""
                     password.text = ""
                     passwordConfirm.text = ""
@@ -75,8 +86,13 @@ Rectangle {
                 }
                 else {
                     entry.signin.currentPassword = password.text
-                    session.newSession(JSON.stringify({"email": email.text, "password": password.text}))
-                    console.log(JSON.stringify({"email": email.text, "password": password.text}))
+
+                    if (username.text.length)
+                        session.newSession(JSON.stringify({"username": username.text, "password": password.text}))
+                    else
+                       session.newSession(JSON.stringify({"email": email.text, "password": password.text}))
+                    //console.log(entry.signin.id)
+
 
 
             }
@@ -92,7 +108,11 @@ Rectangle {
             onClicked: {
 
                     session.destroySession(entry.signin.auth_token)
-                    console.log(JSON.stringify(entry.signin.auth_token))
+
+                    entry.signin.signedin = false
+
+                   //console.log(JSON.stringify(entry.signin.auth_token))
+
 
 
 
@@ -106,6 +126,9 @@ Rectangle {
         }
 
         Component.onCompleted:  {
+
+            username.text = entry.signin.userName
+
             email.text = entry.signin.currentEmail
             password.text = entry.signin.currentPassword
         }
@@ -127,9 +150,16 @@ Rectangle {
                 if (status == 200) {
                     entry.signin.auth_token = tok.auth_token
                     entry.signin.currentEmail = tok.email
+
+                    entry.signin.userName = tok.username
+                    entry.signin.signedin = true
+                    entry.signin.id = tok.id
+                   //console.log("id", tok.id)
                     G.token = tok.auth_token
+                    sockserver.getSocketServer()
                     entry.pushOther(1)
-                    //console.log(entry.signin.auth_token,entry.signin.currentEmail)
+                   //console.log(entry.signin.auth_token,entry.signin.currentEmail, entry.signin.userName)
+
                 }
                 if (status == 204) {
                     entry.pushOther(1)
@@ -137,7 +167,9 @@ Rectangle {
                 }
                 if (status == 422) {
                     fetchStatus.text = "Sorry that email or password is not accepted"
-                    console.log("Sorry that email or password is not accepted")
+
+                   //console.log("Sorry that email or password is not accepted")
+
                 }
 
 
@@ -149,5 +181,10 @@ Rectangle {
 
 
     }
+
+    Cont.SocketServerController {
+        id: sockserver
+    }
+
 }
 

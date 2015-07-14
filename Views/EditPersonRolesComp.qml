@@ -14,10 +14,26 @@ Rectangle {
 
     color: "#edcece"
 
+    ToolBar {
+        id: tb1
+        width: top.width
+        height: (top.height/11) | 0
+        anchors.top: parent.top
+
+        property int deltah: parent.height - height
+        Local.ToolBarContent {
+            id: tbint
+            width:parent.width
+            height:parent.height
+            navheight: top.height/8
+
+        }
+    }
 
         TableView {
             id: tabRoles
-            anchors.top: parent.top
+            anchors.top: tb1.bottom
+
             width: parent.width*7/16
 
             model: cont2.model3//selectRoles
@@ -44,7 +60,9 @@ Rectangle {
         Rectangle {
             id: spacer1
 
-            anchors.top: parent.top
+
+            anchors.top: tb1.bottom
+
 
             anchors.left: tabRoles.right
             anchors.bottom: parent.bottom
@@ -74,7 +92,9 @@ Rectangle {
                         var rid = tabAllRoles.model.get(tabAllRoles.currentRow).id
                         cont2.newPersonRole(top.pid, rid)
 
-                       // console.log(entry.pid)
+
+                       ////console.log(entry.pid)
+
                        // cont1.getRoles(entry.pid)
 
                         //console.log(tabAllRoles.currentRow, top.record.peepID, top.record.roleID)
@@ -118,7 +138,9 @@ Rectangle {
             id: tabAllRoles
             anchors.left: spacer1.right
 
-            anchors.top: parent.top
+
+            anchors.top: tb1.bottom
+
             anchors.right:parent.right
 
             anchors.bottom: parent.bottom
@@ -179,7 +201,9 @@ Rectangle {
                     if (status == 422) {
 
                         //error
-                        console.log(JSON.stringify(JSON.parse(jsn).errors))
+
+                       //console.log(JSON.stringify(JSON.parse(jsn).errors))
+
                         entry.status = JSON.stringify(JSON.parse(jsn).errors)
 
 
@@ -218,7 +242,9 @@ Rectangle {
                     if (status == 422) {
 
                         //error
-                        console.log(JSON.stringify(JSON.parse(jsn).errors))
+
+                       //console.log(JSON.stringify(JSON.parse(jsn).errors))
+
                         entry.status = JSON.stringify(JSON.parse(jsn).errors)
 
 
@@ -242,7 +268,9 @@ Rectangle {
             for (ind = 0 ; ind < model2Count ; ind++) {
                 selectRoles.append(cont1.model2.get(ind))
             }
-            console.log("c",selectRoles.count)
+
+           //console.log("c",selectRoles.count)
+
         }
 
 
@@ -251,7 +279,9 @@ Rectangle {
         Component.onCompleted: {
             cont1.getAll()
             cont1.getRoles(entry.pid)
-            console.log(entry.pid)
+
+           //console.log(entry.pid)
+
             cont1.getAllIndex()
 
         }

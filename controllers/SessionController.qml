@@ -9,7 +9,9 @@ Item {
 
 
     property int readyId
-    property var tok: {"email":"", "password": "", "auth_token": ""}
+
+    property var tok: {"id": 0, "email":"", "username": "", "password": "", "auth_token": ""}
+
     property alias jsn: http.jsn
     property alias status: http.status
     property alias ready: http.ready
@@ -19,6 +21,9 @@ Item {
     id: sessionController
     Component.onCompleted: {
         F.internalQmlObject.servDone.connect(internalRefresh);
+
+        //G.apiRoot=Qt.platform.os == "android" ? "192.168.0.103:8080" : "127.0.0.1:8080"
+
     }
 
     function internalRefresh(callid) {
@@ -31,7 +36,9 @@ Item {
         sessionController.ready = false
         var method = 'POST';
         var params =  user;
-        console.log(user)
+
+        //console.log(user)
+
         var url = G.apiRoot + "/sessions";
         http.servReq(method, params, url, 2)
     }
@@ -41,7 +48,9 @@ Item {
         var method = "DELETE"
         var params = ""
         var url = G.apiRoot + "/sessions/" + tok
-        console.log(url)
+
+        //console.log(url)
+
         http.servReq(method, params, url, 2)
     }
     L.HTTP {
@@ -50,19 +59,28 @@ Item {
         onJsnChanged:  {
             try {
             var objectArray = JSON.parse(jsn).user;
+
+                //console.log(jsn)
+
             } catch(e) {
                 return
             }
             try {
                 sessionController.tok.auth_token = objectArray.auth_token
                 sessionController.tok.email = objectArray.email
+
+                sessionController.tok.username = objectArray.username
                 sessionController.tok.password = objectArray.password
+                sessionController.tok.id = objectArray.id
+
 
             } catch(e) {
                 return
             }
 
-                    //console.log("TOK",tok)
+
+                    ////console.log("TOK",tok)
+
           }
 
     }

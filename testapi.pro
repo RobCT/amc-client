@@ -1,13 +1,33 @@
-TEMPLATE = app
 
-QT += qml quick widgets
+QT += qml quick
+android {
+QT +=androidextras
+}
 
-SOURCES += main.cpp
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
 
-RESOURCES += qml.qrc
+SOURCES += \
+    main.cpp \
+    filereader.cpp
 
-# Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH =
+OTHER_FILES += \
+    qml/main.qml \
+    android-sources/src/org/qtproject/example/testapi/NotificationClient.java \
+    android-sources/AndroidManifest.xml
 
-# Default rules for deployment.
-include(deployment.pri)
+RESOURCES += \
+    main.qrc
+    
+QML_IMPORT_PATH += /usr/share/qml/
+QML2_IMPORT_PATH += /usr/share/qml/
+
+HEADERS += \
+    filereader.h
+android {
+SOURCES += \
+    notificationclient.cpp
+HEADERS += \
+    notificationclient.h
+}
+
+

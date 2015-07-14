@@ -7,15 +7,39 @@ import QtQuick.LocalStorage 2.0
 import QtPositioning 5.4
 import "../controllers" as Cont
 
+import "." as L
+
 Item {
-    width:700
-    height: 500
+    id:top
+    width:parent.width
+
+    height: parent.height
+    ToolBar {
+        id: tb1
+        width: parent.width
+        height: (parent.height/11) | 0
+        anchors.top: parent.top
+
+        property int deltah: parent.height - height
+        L.ToolBarContent {
+            id: tbint
+            width:parent.width
+            height:parent.height
+            navheight: top.height/8
+
+        }
+    }
+
     Rectangle {
         id: mainRect
         property var record
         property bool create
         color: "black"
-        anchors.fill: parent
+
+        width:parent.width
+        height:tb1.deltah
+        anchors.top: tb1.bottom
+
         Component.onCompleted: {
             create = false
             record = {"description_ar":""}
@@ -103,10 +127,12 @@ Item {
                 anchors.fill: parent
                 onClicked:
                     if (tableView1.focus) {
-                        console.log(tableView1.model.get(tableView1.currentRow).id, tableView1.currentRow)
+
+                       //console.log(tableView1.model.get(tableView1.currentRow).id, tableView1.currentRow)
 
                         cont1.deleteRole(tableView1.model.get(tableView1.currentRow).id)
-                        console.log(tableView1.model.get(tableView1.currentRow).id, tableView1.currentRow)
+                       //console.log(tableView1.model.get(tableView1.currentRow).id, tableView1.currentRow)
+
                     }
                     }
             }
@@ -131,12 +157,16 @@ Item {
             }
             Component.onCompleted: {
                 cont1.getAll()
-                console.log(cont1.model1.count)
+
+               //console.log(cont1.model1.count)
+
 
             }
             onCurrentRowChanged:  {
                 if (focus) {
-                    console.log(mainRect.record.description)
+
+                   //console.log(mainRect.record.description)
+
 
                     textField1.text = model.get(currentRow).description
 
@@ -197,7 +227,9 @@ Item {
                 if (status == 422) {
 
                     //error
-                    console.log(JSON.stringify(JSON.parse(jsn).errors))
+
+                   //console.log(JSON.stringify(JSON.parse(jsn).errors))
+
                     entry.status = JSON.stringify(JSON.parse(jsn).errors)
 
 

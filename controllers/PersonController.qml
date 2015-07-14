@@ -12,11 +12,17 @@ Item {
     property alias jsn: http.jsn
     property alias status: http.status
 
+    property alias m1ready: model1.ready
+    property alias m1status: model1.status
+
 
 
     id: peopleController
     Component.onCompleted: {
         F.internalQmlObject.servDone.connect(internalRefresh);
+
+        //G.apiRoot=Qt.platform.os == "android" ? "192.168.0.103:8080" : "127.0.0.1:8080"
+
     }
     L.JSONListModel {
         id:model1
@@ -35,17 +41,25 @@ Item {
         }
     }
     function getAll() {
+
+        model1.method = "GET"
         model1.source = ""
         model1.source = G.apiRoot + "/people"
-        console.log("source ", model1.source)
+        //console.log("source ", model1.source)
+        model1.commit()
     }
     function getPerson(pid) {
+        model2.method = "GET"
         model2.source = ""
         model2.source = G.apiRoot + "/people/" + pid.toString()
+        model2.commit()
     }
     function getPersonRoles(pid) {
+        model3.method = "GET"
         model3.source = ""
         model3.source = G.apiRoot + "/people/" + pid.toString() + "/roles"
+        model3.commit()
+
     }
 
     function newPerson(user){
@@ -60,7 +74,9 @@ Item {
         peopleController.ready = false
         var method = 'POST';
         var params =  JSON.stringify({role_id: rid});
-        console.log(params)
+
+        //console.log(params)
+
         var url = G.apiRoot + "/people/"  + pid.toString() + "/roles";
         http.servReq(method, params, url, 2)
     }
@@ -84,7 +100,9 @@ Item {
         peopleController.ready = false
         var method = 'DELETE';
         var params =  JSON.stringify({role_id: rid});
-        console.log(params)
+
+        //console.log(params)
+
         var url = G.apiRoot + "/people/"  + pid.toString() + "/roles/?role_id=" + rid.toString();
         http.servReq(method, params, url, 2)
     }
