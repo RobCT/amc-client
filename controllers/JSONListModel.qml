@@ -132,7 +132,7 @@ Item {
             try {
                 ready = false
                servReq(method, params, source, 99)
-               // //console.log("source",source, json)
+               //console.log("source",source, params)
                 //ready = false
                 method = "GET"
             } catch(e) {

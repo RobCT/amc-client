@@ -73,6 +73,7 @@ Rectangle {
     width: parent.width
     height: tb1.deltah
     anchors.top: tb1.bottom
+    z: 5
     color: "linen"
     property int actionheight
 
@@ -1021,7 +1022,8 @@ Rectangle {
                 //reader.openandroid(addfiles.model1.get(tvattach.currentRow).filename,addfiles.model1.get(tvattach.currentRow).content_type )
             }
             else {
-            reader.open(addfiles.model1.get(tvattach.currentRow).filename)
+                reader.saveDownload(addfiles.model1.get(tvattach.currentRow).filename,addfiles.model1.get(tvattach.currentRow).content_type)
+                reader.open(addfiles.model1.get(tvattach.currentRow).filename)
             }
         }
         onUploaded: {

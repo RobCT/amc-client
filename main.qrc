@@ -73,5 +73,13 @@
         <file>Views/EditEvent.qml</file>
         <file>Views/ToolBarContent.qml</file>
         <file>android-sources/src/org/qtproject/example/testapi/IntentView.java</file>
+        <file>Views/TestDialog.qml</file>
+        <file>images/toolbar2.png</file>
+        <file>Views/ToolBarCalendarContent.qml</file>
+        <file>images/break_out_left.svg</file>
+        <file>images/break_out_right.svg</file>
+        <file>images/break_out_right.png</file>
+        <file>components/TumblerTime.qml</file>
+        <file>images/plus.svg</file>
     </qresource>
 </RCC>

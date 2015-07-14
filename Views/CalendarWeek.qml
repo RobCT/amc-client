@@ -15,15 +15,51 @@ Rectangle {
     color: "lightsteelblue"
     property var  selectedDate
     property bool my_calendar: false
+    property var ent: entry
+    property bool ready: false
     Component.onCompleted: {
         hamburger.connect(ham)
+        monthcalendar.connect(monthcal)
+        //tim2.start()
     }
     onVisibleChanged: {
-        if (visible) tim2.start()
+        if (ready ) {
+            if (visible) tim2.start()
+        }
 
     }    function ham() {
         if (topRect.visible) topRect.visible = false
         else topRect.visible  = true
+
+    }
+    function monthcal() {
+        while (ent.depth > ent.startingCalIndex) {
+            console.log("pop",ent.depth)
+            ent.pop()
+        }
+        entry.calChangeProperties = {my_calendar: top.my_calendar, selectedDate: D.moment(entry.selectedDate)}// D.moment(calendar.currentDate)}
+        //entry.push({item: entry.cal, replace: false, properties: entry.calChangeProperties})
+
+    }
+    function getMonthIndex(dt) {
+        try {
+         if (!dt.isMoment) dt = D.moment(dt)
+        }
+        catch(e) {
+
+        }
+        dt.hour(1); dt.minute(0); dt.second(0)
+        var ind
+        var caldt
+        for (ind = 0; ind < calEvents.model3.count; ind++) {
+            caldt = D.moment(calEvents.model3.get(ind).date)
+            caldt.hour(1); caldt.minute(0); caldt.second(0)
+            //console.log(ind, dt, caldt, D.moment(dt.format("YYYY-MM-DD")).isSame(caldt.format("YYYY-MM-DD")), caldt.format("DD-MM-YYYY"), D.moment('2010-10-20').isSame('2010-10-20'))
+
+            if (D.moment(dt.format("YYYY-MM-DD")).isSame(caldt.format("YYYY-MM-DD"))) {
+                return ind
+            }
+        }
     }
 
 
@@ -31,8 +67,11 @@ Rectangle {
         id: tim2
           interval: 1; running: false; repeat: false
             onTriggered: {
-                if (!entry.busy)
-                calEvents.getCalendar(calendar.selectedDate.year(),calendar.selectedDate.month()+1,calendar.selectedDate.date(),"week")
+                if (!entry.busy) {
+                    calendar.currentDate = entry.selectedDate
+                    //console.log("L69")
+                    calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"week")
+                }
                 else restart()
 
             }
@@ -54,12 +93,18 @@ Rectangle {
 
             //date: D.moment(new Date)
             onReturnDateChanged: {
-                //console.log("isitme",returnDate)
-                calendar.selectedDate = returnDate
+                if (top.ready) {
+                    //console.log("isitme",returnDate)
+                   entry.selectedDate = D.moment(returnDate)
+                    //console.log("L94")
+                    calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"week")
+                    bannerweek.date = entry.selectedDate//.format("MMM YYYY")
+                    calendar.currentDate = entry.selectedDate
+                }
             }
             Component.onCompleted: {
-                bannerweek.date = D.moment(calendar.selectedDate)
-               //console.log("seldate",calendar.selectedDate)
+                bannerweek.date = D.moment(entry.selectedDate)
+               //console.log("seldate",entry.selectedDate)
             }
         }
 
@@ -69,10 +114,7 @@ Rectangle {
             width: parent.width
             anchors.top: bannerweek.bottom
             anchors.topMargin: 20
-            //anchors.right: parent.right
-            //anchors.rightMargin: height*
-            //opacity: entry.depth > 1 ? 1 : 0
-            //anchors.verticalCenter: parent.verticalCenter
+
             antialiasing: true
             height: parent.width
             radius: 4
@@ -103,7 +145,7 @@ Rectangle {
         anchors.top: parent.top
 
         property int deltah: parent.height - height
-        L.ToolBarContent {
+        L.ToolBarCalendarContent {
             id: tbint
             width:parent.width
             height:parent.height
@@ -111,35 +153,191 @@ Rectangle {
 
         }
     }
+    Rectangle {
+        id: header
+        anchors.top: tb1.bottom
+        height: parent.height/20
+        color: "light green"
+        width: !topRect.visible ? parent.width : parent.width*5/6 | 0
+        Rectangle {
+
+            id: decButton
+            width: parent.height
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
+            antialiasing: true
+            height: parent.height
+            radius: 4
+            color: backmouse.pressed ? "#222" : "transparent"
+            Behavior on opacity { NumberAnimation{} }
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "../images/navigation_previous_item.png"
+                width: parent.height
+                height: parent.height
+            }
+            MouseArea {
+                id: backmouse
+                anchors.fill: parent
+                anchors.margins: -10
+                onClicked: {
+                    entry.selectedDate = entry.selectedDate.subtract(1,"w")
+                    //console.log("L181")
+                    calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"week")
+                    calendar.currentDate = entry.selectedDate
+
+            }
+        }
+        }
+        Rectangle {
+            width: parent.width/3
+            height: parent.height
+            color: "transparent"
+            anchors.centerIn: parent
+            Text {
+                anchors.centerIn: parent
+                text: entry.selectedDate.format("MMMM YYYY")
+            }
+        }
+
+        Rectangle {
+
+            id: plusButton
+            width: parent.height
+            anchors.right: parent.right
+            anchors.rightMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
+            antialiasing: true
+            height: parent.height
+            radius: 4
+            color: plusmouse.pressed ? "#222" : "transparent"
+            Behavior on opacity { NumberAnimation{} }
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "../images/navigation_next_item.png"
+                width: parent.height
+                height: parent.height
+            }
+            MouseArea {
+                id: plusmouse
+                anchors.fill: parent
+                anchors.margins: -10
+                onClicked: {
+                    entry.selectedDate = entry.selectedDate.add(1,"w")
+                    //console.log("L222")
+                    calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"week")
+                    calendar.currentDate = entry.selectedDate
+            }
+        }
+        }
+    }
     GridView {
         id:calendar
-        anchors.top: tb1.bottom
+        anchors.top: header.bottom
         //anchors.topMargin: parent.height/40
         model: calEvents.model3
         property bool busy: entry.busy
         delegate: calDelegate
         width: !topRect.visible ? parent.width : parent.width*5/6 | 0
-        height: tb1.deltah
+        height: tb1.deltah - header.height - tb1.deltah/30
         cellWidth: width/7 | 0
         cellHeight: height/(model.count/7) +1
         property var selectedDate
         property var currentDate
         property var currentEvents
-        onSelectedDateChanged:  {
+        header:         Rectangle {
+            id: headerDays
+            height: tb1.deltah/30
+            width: calendar.width
+            color: "light cyan"
+            Row {
+                height: parent.height
+                width:parent.width
+            Rectangle {
+                width: parent.width/7
+                height: parent.height
+                color: "transparent"
+                Text {
+                    anchors.centerIn: parent
+                    text: "Sun"
+                }
+            }
+            Rectangle {
+                width: parent.width/7
+                height: parent.height
+                color: "transparent"
+                Text {
+                    anchors.centerIn: parent
+                    text: "Mon"
+                }
+            }
+            Rectangle {
+                width: parent.width/7
+                height: parent.height
+                color: "transparent"
+                Text {
+                    anchors.centerIn: parent
+                    text: "Tue"
+                }
+            }
+            Rectangle {
+                width: parent.width/7
+                height: parent.height
+                color: "transparent"
+                Text {
+                    anchors.centerIn: parent
+                    text: "Wed"
+                }
+            }
+            Rectangle {
+                width: parent.width/7
+                height: parent.height
+                color: "transparent"
+                Text {
+                    anchors.centerIn: parent
+                    text: "Thu"
+                }
+            }
+            Rectangle {
+                width: parent.width/7
+                height: parent.height
+                color: "transparent"
+                Text {
+                    anchors.centerIn: parent
+                    text: "Fri"
+                }
+            }
+            Rectangle {
+                width: parent.width/7
+                height: parent.height
+                color: "transparent"
+                Text {
+                    anchors.centerIn: parent
+                    text: "Sat"
+                }
+            }
+            }
+
+
+        }
+        /*onSelectedDateChanged:  {
            //console.log("dateChanged", selectedDate)
             //console.log(selectedDate,selectedDate.year(),selectedDate.month())
-            calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"week")
+            calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"week")
             bannerweek.date = selectedDate//.format("MMM YYYY")
-        }
+        }*/
 
         Timer {
             id: tim1
               interval: 1; running: false; repeat: false
                 onTriggered: {
                     if (!entry.busy) {
-                        calendar.selectedDate = top.selectedDate
-                        calendar.currentDate = selectedDate
-                        calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"week")
+                       entry.selectedDate = D.moment(top.selectedDate)
+                        calendar.currentDate = entry.selectedDate
+                        //console.log("L333")
+                        calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"week")
+                        top.ready = true
                     }
                     else restart()
             }
@@ -168,6 +366,7 @@ Rectangle {
                     height: parent.height
                     onClicked: {
                         //console.log(events.get(0).title)
+                        entry.selectedDate = D.moment(date)
                         calendar.currentIndex = index
                         calendar.currentDate = date
                         calendar.currentEvents = events
@@ -188,13 +387,7 @@ Rectangle {
                         width: parent.width
                         height: parent.height
                         onClicked:  {
-                        //    entry.lists.blank = {"date":""}
-                        //    entry.lists.blank.date = D.moment(date).format("YYYY-MM-DD")
-                        //    entry.pushOther(8)
-                            //dialog1.index = 0
-                            //dialog1.setDate = date
-                            //top.visible = false
-                            //dialog1.open()
+
                             entry.push({item: editev, properties: {setDate: date, index: 0}})
 
 
@@ -271,35 +464,7 @@ Rectangle {
                    }
 
 
- /*               TableView {
-                    id: eventSelect
-                    width: calendar.cellWidth
 
-                    anchors.top: calInfo.bottom
-                    anchors.bottom: parent.bottom
-                    model: events
-                    headerVisible: false
-                    visible: true
-                    TableViewColumn {
-                        role: "title"
-                        title: "Title"
-                        width: calendar.cellWidth/2
-                    }
-                    TableViewColumn {
-                        role: "eventdate"
-                        title: "Date"
-                        width: calendar.cellWidth/2
-                    }
-                    onClicked: {
-                        //console.log("dcev",eventSelect.currentRow, events.get(eventSelect.currentRow).id )
-                        //dialog1.index = events.get(eventSelect.currentRow).id
-                        //top.visible = false
-                        //dialog1.open()
-                        entry.push({item: editev, properties: {index: events.get(eventSelect.currentRow).id}})
-
-                    }
-
-            }*/
         }
     }
     ListModel {
@@ -308,6 +473,13 @@ Rectangle {
     }
     Cont.EventController {
         id: calEvents
+        onM3readyChanged: {
+
+            if (m3status == 200) {
+                //console.log(m3jsn)
+                calendar.currentIndex = top.getMonthIndex(entry.selectedDate)
+            }
+        }
     }
     Component {
         id: editev
@@ -323,12 +495,14 @@ Rectangle {
 
     }
     }
+
     Component {
         id:sheet
     L.EditVolunteerSheet {
 
     }
     }
+
 
 
 

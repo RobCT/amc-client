@@ -15,24 +15,40 @@ Rectangle {
     color: "lightsteelblue"
     property var  selectedDate
     property bool my_calendar: false
+    property var ent: entry
     onVisibleChanged: {
+        console.log("vis",selectedDate, my_calendar)
         if (visible) tim2.start()
 
     }
     Component.onCompleted: {
+        console.log(selectedDate, my_calendar)
         hamburger.connect(ham)
+        monthcalendar.connect(monthcal)
+         tim2.start()
     }
     function ham() {
         if (topRect.visible) topRect.visible = false
         else topRect.visible  = true
+    }
+    function monthcal() {
+        while (ent.depth > ent.startingCalIndex) {
+            console.log("pop",ent.depth)
+            ent.pop()
+        }
+        entry.calChangeProperties = {my_calendar: top.my_calendar, selectedDate: D.moment(entry.selectedDate)}// D.moment(calendar.currentDate)}
+        //entry.push({item: entry.cal, replace: false, properties: entry.calChangeProperties})
+
     }
 
     Timer {
         id: tim2
           interval: 1; running: false; repeat: false
             onTriggered: {
-                if (!entry.busy)
-                calEvents.getCalendar(calendar.selectedDate.year(),calendar.selectedDate.month()+1,calendar.selectedDate.date(),"day")
+                if (!entry.busy) {
+                    calendar.currentDate = entry.selectedDate
+                    calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"day")
+                }
                 else restart()
 
             }
@@ -56,11 +72,14 @@ Rectangle {
             //date: D.moment(new Date)
             onReturnDateChanged: {
                 //console.log("isitme",returnDate)
-                calendar.selectedDate = returnDate
+              entry.selectedDate = returnDate
+                calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"day")
+                banner.date = entry.selectedDate//.format("MMM YYYY")
+                calendar.currentDate = entry.selectedDate
             }
             Component.onCompleted: {
-                banner.date = D.moment(calendar.selectedDate)
-                console.log("seldate",calendar.selectedDate)
+                banner.date = D.moment(entry.selectedDate)
+                console.log("seldate",entry.selectedDate)
             }
         }
 
@@ -74,7 +93,7 @@ Rectangle {
         anchors.top: parent.top
 
         property int deltah: parent.height - height
-        L.ToolBarContent {
+        L.ToolBarCalendarContent {
             id: tbint
             width:parent.width
             height:parent.height
@@ -100,7 +119,7 @@ Rectangle {
         onSelectedDateChanged:  {
             console.log("dateChanged", selectedDate)
             //console.log(selectedDate,selectedDate.year(),selectedDate.month())
-            calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"day")
+            calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"day")
             banner.date = selectedDate//.format("MMM YYYY")
         }
         function callEdit(id) {
@@ -165,9 +184,9 @@ Rectangle {
               interval: 1; running: false; repeat: false
                 onTriggered: {
                     if (!entry.busy) {
-                        calendar.selectedDate = top.selectedDate
-                        calendar.currentDate = selectedDate
-                        calEvents.getCalendar(selectedDate.year(),selectedDate.month()+1,selectedDate.date(),"day")
+                      entry.selectedDate = top.selectedDate
+                        calendar.currentDate = entry.selectedDate
+                        calEvents.getCalendar(entry.selectedDate.year(),entry.selectedDate.month()+1,entry.selectedDate.date(),"day")
                     }
                     else restart()
             }
@@ -197,7 +216,7 @@ Rectangle {
                     height: parent.height
                     onClicked: {
 
-
+                        entry.selectedDate = date
                         calendar.currentIndex = index
                         calendar.currentDate = date
                         calendar.currentEvents = events

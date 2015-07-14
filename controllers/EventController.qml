@@ -16,6 +16,9 @@ Item {
     property int readyId
     property alias jsn: model4.json
     property alias status: model4.status
+    property alias m3ready: model3.ready
+    property alias m3status: model3.status
+    property alias m3jsn: model3.json
 
 
 

@@ -21,13 +21,17 @@ import "../scripts/globals.js" as G
 Rectangle {
     id: mainWindow
     //title: qsTr("")
-    width: Screen.width
-    height: Screen.height
+    width: 800//Screen.width
+    height: 600//Screen.height
     property int navheight
     navheight: height/8
     visible: true
     property string topwidg: "Top"
     signal hamburger()
+    signal weekcalendar()
+    signal monthcalendar()
+    signal daycalendar()
+    signal addevent()
     property var statusBar: StatusBar {
         RowLayout {
 
@@ -256,10 +260,20 @@ Rectangle {
         anchors.fill: parent
         property var editProperties: {"toEdit": ""  , "editText": "", editTime: "null", editDate: "", editDone: false, recordId: "", editType: "" }
         property string status
+        property var calChangeProperties: {"my_calendar": false, "selectedDate": D.moment(new Date)}
         property var lists
         property var pid
         property var signin: {"id": 0,"signedin": false, "auth_token": "", "socket_token": "", "userName": "", "currentEmail": "", "currentPassword": ""}
-
+        property var initialItem: personComp
+        property var cal: calendar
+        property var  selectedDate
+        property int startingCalIndex
+        onSelectedDateChanged: {
+            console.log("seldatechng", selectedDate)
+        }
+        onStartingCalIndexChanged: {
+            console.log("calind", startingCalIndex)
+        }
 
        Component.onCompleted: {
            signin.userName = settings.username
@@ -294,7 +308,7 @@ Rectangle {
             else if (val === 6) push(editRoles)
             else if (val === 7) push(ev2Comp)
             else if (val === 8) push(volTemplates)
-            else if (val === 11) push({item: calendar, properties: {selectedDate: D.moment(new Date)}})
+            else if (val === 11) {push({item: calendar, properties: {selectedDate: D.moment(new Date)}}); startingCalIndex = depth}
             }
 
 

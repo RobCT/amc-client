@@ -36,6 +36,15 @@ Rectangle {
             //edit.time = toEdit
         }
     }
+    onTimeChanged: {
+
+            lvhu.currentIndex = 2
+            lvht.currentIndex = 2
+            lvmu.currentIndex = 2
+            lvmt.currentIndex = 2
+            tim1.start()
+
+    }
 
    Timer {
        id: tim1
@@ -51,7 +60,7 @@ Rectangle {
    }
     Rectangle{
         anchors.fill: parent
-        anchors.margins: parent.height/20
+        //anchors.margins: parent.height/20
 
         color: "black"
         radius: 10
@@ -59,28 +68,27 @@ Rectangle {
         Rectangle {
             id: inRect
             anchors.fill: parent
-            anchors.margins: parent.height/7
+            anchors.margins: parent.height/7 | 0
             color: "linen"
             radius: 9
 
             RowLayout {
                 id: lvRect
-                width: parent.width
-                anchors.verticalCenter: parent.verticalCenter
-                height: parent.height - parent.height * 0.1
+                anchors.fill: parent
+
                 ListView {
                     id: lvht
-                    width: parent.width/5
+                    width: parent.width/5 | 0
                     height:parent.height
                     property int ci: currentIndex
                     model: hourTensModel
                     delegate: lvdelegate
                     snapMode: ListView.SnapOneItem
-                    highlight: highlight
+                    //highlight: highlight
                     verticalLayoutDirection: ListView.BottomToTop
                     highlightRangeMode: ListView.StrictlyEnforceRange
-                    preferredHighlightBegin: y //+(height - inRect.height/3) /2
-                    preferredHighlightEnd: y + height// -(height - inRect.height/3) /2
+                    preferredHighlightBegin: lvRect.y //+(height - inRect.height/3) /2
+                    preferredHighlightEnd: lvRect.y + lvRect.height// -(height - inRect.height/3) /2
                     Component.onCompleted: {
                         currentIndex = 2
                     }
@@ -96,18 +104,18 @@ Rectangle {
                 }
                 ListView {
                     id: lvhu
-                    width: parent.width/5
+                    width: parent.width/5 | 0
                     x: lvht.x + width
                     property int ci: currentIndex
                     height:parent.height
                     model: unitsModel
                     delegate: lvdelegate
-                    highlight: highlight
+                    //highlight: highlight
                     verticalLayoutDirection: ListView.BottomToTop
 
                     highlightRangeMode: ListView.StrictlyEnforceRange
-                    preferredHighlightBegin: y //+(height - inRect.height/3) /2
-                    preferredHighlightEnd: y + height// -(height - inRect.height/3) /2
+                    preferredHighlightBegin: lvRect.y //+(height - inRect.height/3) /2
+                    preferredHighlightEnd: lvRect.y + lvRect.height// -(height - inRect.height/3) /2
                     onCurrentIndexChanged: {
                         if (lvht.currentIndex == 2 && lvhu.currentIndex > 3) lvhu.currentIndex = 3
                         var dt = D.moment(new Date(2001,01,01))
@@ -122,27 +130,27 @@ Rectangle {
                 Rectangle {
                     id: colRect
                     x: lvhu.x + width
-                    width: parent.width/5
+                    width: parent.width/5 | 0
                     height:parent.height
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: parent.height*0.6
+                        font.pixelSize: parent.height*0.6 | 0
                         text: " : "
 
                     }
                 }
                 ListView {
                     id: lvmt
-                    width: parent.width/5
+                    width: parent.width/5 | 0
                     property int ci: currentIndex
                     highlightRangeMode: ListView.StrictlyEnforceRange
                     x: colRect.x + width
                     height:parent.height
-                    highlight: highlight
+                    //highlight: highlight
                     verticalLayoutDirection: ListView.BottomToTop
-                    preferredHighlightBegin: y //+(height - inRect.height/3) /2
-                    preferredHighlightEnd: y + height // -(height - inRect.height/3) /2
+                    preferredHighlightBegin: lvRect.y //+(height - inRect.height/3) /2
+                    preferredHighlightEnd: lvRect.y + lvRect.height // -(height - inRect.height/3) /2
 
                     model: minsTensModel
                     delegate: lvdelegate
@@ -161,17 +169,17 @@ Rectangle {
 
                 ListView {
                     id: lvmu
-                    width: parent.width/5
+                    width: parent.width/5 | 0
                     height:parent.height
                     x: lvmt.x + width
                     model: unitsModel
                     property int ci: currentIndex
-                    highlight: highlight
+                    //highlight: highlight
                     delegate: lvdelegate
                     verticalLayoutDirection: ListView.BottomToTop
                     highlightRangeMode: ListView.StrictlyEnforceRange
-                    preferredHighlightBegin: y //+(height - inRect.height/3) /2
-                    preferredHighlightEnd: y + height //-(height - inRect.height/3) /2
+                    preferredHighlightBegin: parent.top | 0//lvRect.y //+(height - inRect.height/3) /2
+                    preferredHighlightEnd: preferredHighlightBegin + height// lvRect.y + lvRect.height //-(height - inRect.height/3) /2
                     Component.onCompleted: {
                         currentIndex = 2
                     }
@@ -193,8 +201,9 @@ Rectangle {
         id: highlight
         Rectangle {
             color: "lightsteelblue"
-            width: inRect.width/5
-            height: inRect.height/3
+            width: inRect.width/5 | 0
+            height: inRect.height
+            radius: 10
 
         }
     }
@@ -203,7 +212,7 @@ Rectangle {
         id: lvdelegate
         Item {
             id: deltop
-            width: inRect.width/5
+            width: inRect.width/5 | 0
             height: lvRect.height
             property int currentIndex: ListView.view.ci
 
@@ -221,7 +230,7 @@ Rectangle {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: parent.height*0.6
+                    font.pixelSize: parent.height*0.6 | 0
                     text: digit
                 }
 

@@ -44,6 +44,7 @@ Item {
 
     RowLayout {
         anchors.top: row1.bottom
+        z: 5
         Button {
             id: button1
             visible: false
@@ -68,18 +69,7 @@ Item {
             visible: false
             text: qsTr("Press Me 2")
             onClicked: {
-                //console.log(addfiles.model1.count)
-                //console.log(addfiles.model2.get(0).file_file_name)
-                //addfiles.getAttachment(6)
-                //console.log(addfiles.model2.get(0).file)
-                //http.servReq("GET","",addfiles.model2.get(0).file,99)
-                //openfile.open()
-                //download.getFile(addfiles.model2.get(0).file)
-                //Qt.openUrlExternally(addfiles.model2.get(0).file)
-                fileReader.openandroid("Ezekiel Man of Visions English.pdf","application/pdf" )
 
-
-                //console.log(Qt.platform.os)
             }
         }
 
@@ -132,6 +122,7 @@ Item {
         id: row1
         x: 17
         y: 26
+        z: 5
         width: parent.width
         height: tb1.deltah *0.9
         anchors.top: tb1.bottom
@@ -526,5 +517,6 @@ Item {
                      Cont.HTTP {
                          id: http
                      }
+                     
 
              }
